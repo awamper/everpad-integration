@@ -281,7 +281,14 @@ const Everpad = new Lang.Class({
     },
 
     _search_notes: function(term) {
-        DBus.get_everpad_provider().find_notesRemote(term, [], [], 0, MAX_SEARCH_RESULTS, 0, -1,
+        DBus.get_everpad_provider().find_notesRemote(
+            term,
+            [],
+            [],
+            0,
+            MAX_SEARCH_RESULTS,
+            0,
+            -1,
             Lang.bind(this, function(result, error) {
                 if(result != null) {
                     this.notes_view.set_label(EverpadNotes.LABELS.search);
@@ -331,7 +338,14 @@ const Everpad = new Lang.Class({
             true
         );
 
-        DBus.get_everpad_provider().find_notesRemote('p', [], [], 0, MAX_PINNED_NOTES, EverpadTypes.NOTE_ORDER_TITLE, -1,
+        DBus.get_everpad_provider().find_notesRemote(
+            '',
+            [],
+            [],
+            0,
+            MAX_PINNED_NOTES,
+            EverpadTypes.NOTE_ORDER_TITLE,
+            1,
             Lang.bind(this, function(result, error) {
                 if(result != null) {
                     let notes = this._load_notes(result);
@@ -357,7 +371,14 @@ const Everpad = new Lang.Class({
         this.notes_view.set_label(EverpadNotes.LABELS.latest, false);
         this.notes_view.snippets.show_message("Loading...", true);
 
-        DBus.get_everpad_provider().find_notesRemote('', [], [], 0, MAX_LATEST_NOTES, EverpadTypes.NOTE_ORDER_UPDATED_DESC, -1,
+        DBus.get_everpad_provider().find_notesRemote(
+            '',
+            [],
+            [],
+            0,
+            MAX_LATEST_NOTES,
+            EverpadTypes.NOTE_ORDER_UPDATED_DESC,
+            -1,
             Lang.bind(this, function(result, error) {
                 if(result != null) {
                     this.notes_view.set_label(EverpadNotes.LABELS.latest);
