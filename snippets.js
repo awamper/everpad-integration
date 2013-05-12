@@ -264,18 +264,28 @@ const EverpadNoteSnippetBase = new Lang.Class({
         );
         this.date.clutter_text.set_markup(this.date.default_text);
         this.date.connect("enter-event", Lang.bind(this, function() {
-            this._label_transition(
-                this.date,
-                this.date.hover_text,
-                DATE_ANIMATION_TIME
+            this.date.timeout_id = Mainloop.timeout_add(300,
+                Lang.bind(this, function() {
+                    this._label_transition(
+                        this.date,
+                        this.date.hover_text,
+                        DATE_ANIMATION_TIME
+                    );
+                })
             );
         }));
         this.date.connect("leave-event", Lang.bind(this, function() {
-            this._label_transition(
-                this.date,
-                this.date.default_text,
-                DATE_ANIMATION_TIME
-            );
+            if(this.date.timeout_id > 0) {
+                Mainloop.source_remove(this.date.timeout_id);
+            }
+
+            if(this.date.text === this.date.hover_text) {
+                this._label_transition(
+                    this.date,
+                    this.date.default_text,
+                    DATE_ANIMATION_TIME
+                );
+            }
         }));
     },
 
