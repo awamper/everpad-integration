@@ -452,7 +452,6 @@ const EverpadSnippetsView = new Lang.Class({
     },
 
     _refresh: function() {
-        log("_refresh snippet");
         this._box.remove_all_children();
 
         if(this._snippets.length < 1) {
