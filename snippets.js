@@ -70,6 +70,21 @@ const EverpadNoteSnippetBase = new Lang.Class({
 
             Utils.get_status_bar().remove_message(this.actor.statusbar_message_id);
         }));
+        this.actor.connect("button-press-event",
+            Lang.bind(this, function(o, e) {
+                let button = e.get_button();
+
+                if(button === Clutter.BUTTON_PRIMARY) {
+                    // this.actor.add_style_pseudo_class('active');
+                    this.emit("clicked", this);
+                }
+            })
+        );
+        // this.actor.connect("button-release-event",
+        //     Lang.bind(this, function(o, e) {
+        //         this.actor.remove_style_pseudo_class('active');
+        //     })
+        // );
 
         this.make_title();
         this.make_text();
@@ -301,6 +316,7 @@ const EverpadNoteSnippetBase = new Lang.Class({
         this.actor.destroy();
     }
 });
+Signals.addSignalMethods(EverpadNoteSnippetBase.prototype);
 
 const EverpadNoteSnippetSmall = new Lang.Class({
     Name: "EverpadNoteSnippetSmall",
@@ -506,15 +522,9 @@ const EverpadSnippetsView = new Lang.Class({
 
     add: function(snippet) {
         if(snippet instanceof EverpadNoteSnippetBase) {
-            snippet.actor.connect("button-press-event",
-                Lang.bind(this, function(o, e) {
-                    let button = e.get_button();
-
-                    if(button === Clutter.BUTTON_PRIMARY) {
-                        this.emit("snippet-clicked", snippet);
-                    }
-                })
-            );
+            snippet.connect("clicked", Lang.bind(this, function(snippet) {
+                this.emit("snippet-clicked", snippet);
+            }));
 
             this._snippets.push(snippet);
 
