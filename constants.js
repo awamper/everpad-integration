@@ -3,9 +3,9 @@ const TIMEOUT_IDS = {
 };
 
 const SEARCH_DELAY = 700;
-const MAX_PINNED_NOTES = 15;
-const MAX_LATEST_NOTES = 15;
-const MAX_SEARCH_RESULTS = 15;
+const MAX_PINNED_NOTES = 30;
+const MAX_LATEST_NOTES = 20;
+const MAX_SEARCH_RESULTS = 20;
 
 const STATUS_NONE = 0
 const STATUS_SYNC = 1
