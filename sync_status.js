@@ -36,7 +36,6 @@ const EverpadSyncStatus = new Lang.Class({
         this._sync_button.connect("button-press-event", Lang.bind(this,
             this._on_button_press
         ));
-        this._sync_button.add_actor(this._sync_button);
         this.actor.add(this._sync_button, {
             row: 0,
             col: 1,
