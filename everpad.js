@@ -378,7 +378,7 @@ const Everpad = new Lang.Class({
             0,
             MAX_LATEST_NOTES,
             EverpadTypes.NOTE_ORDER_UPDATED_DESC,
-            -1,
+            0,
             Lang.bind(this, function(result, error) {
                 if(result != null) {
                     this.notes_view.set_label(EverpadNotes.LABELS.latest);
