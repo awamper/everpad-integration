@@ -104,6 +104,10 @@ const EverpadPanelButton = Lang.Class({
         this.actor.add_actor(this._button_box);
 
         this._menu = new EverpadMenu.EverpadMenu();
+        this._menu.set_logo(new St.Label({
+            text: "Everpad",
+            style_class: 'everpad-logo-label'
+        }));
         this._add_menu_items();
 
         this._everpad = new Everpad.Everpad();

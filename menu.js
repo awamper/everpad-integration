@@ -12,7 +12,7 @@ const Utils = Me.imports.utils;
 const EverpadPinnedNotes = Me.imports.pinned_notes;
 
 const MOUSE_POLL_FREQUENCY = 50;
-const MENU_ANIMATION_TIME = 0.4;
+const MENU_ANIMATION_TIME = 0.3;
 
 const EverpadMenu = new Lang.Class({
     Name: "EverpadMenu",
@@ -25,6 +25,22 @@ const EverpadMenu = new Lang.Class({
         });
         Main.layoutManager.panelBox.add_actor(this.actor);
         this.actor.lower_bottom();
+
+        this._logo_box = new St.BoxLayout();
+        this.actor.add(this._logo_box, {
+            row: 0,
+            col: 0,
+            expand: false,
+            x_fill: false,
+            y_fill: false,
+            x_align: St.Align.MIDDLE,
+            y_align: St.Align.MIDDLE
+        })
+
+        let logo = new St.Label({
+            text: "Menu"
+        });
+        this.set_logo(logo);
 
         this._open = false;
         this._modal = true;
@@ -39,7 +55,7 @@ const EverpadMenu = new Lang.Class({
         let my_width = primary.width * 0.15;
         let available_height =
             primary.height - Main.layoutManager.keyboardBox.height;
-        let my_height = Math.min(primary.height * 0.2, available_height * 0.9);
+        let my_height = Math.min(primary.height * 0.30, available_height * 0.9);
 
         this.actor.x = 0;
         this._hidden_y = this.actor.get_parent().height - my_height - 2;
@@ -83,6 +99,17 @@ const EverpadMenu = new Lang.Class({
         this._pointer_watch = null;
     },
 
+    set_logo: function(actor) {
+        this._logo_box.destroy_all_children();
+        this._logo_box.add(actor, {
+            expand: false,
+            x_fill: false,
+            y_fill: false,
+            x_align: St.Align.MIDDLE,
+            y_align: St.Align.MIDDLE
+        });
+    },
+ 
     set_position: function(source_actor) {
         let source_allocation = Shell.util_get_transformed_allocation(
             source_actor
