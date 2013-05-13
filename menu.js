@@ -43,8 +43,6 @@ const EverpadMenu = new Lang.Class({
         this.set_logo(logo);
 
         this._open = false;
-        this._modal = true;
-        this._track_mouse = true;
         this._is_hover = false;
 
         this._resize();
@@ -165,22 +163,10 @@ const EverpadMenu = new Lang.Class({
         this.actor.add(actor, params);
     },
 
-    show: function(visible_part_height) {
+    show: function() {
         if(this._open) return;
 
-        visible_part_height = visible_part_height || 0;
-        let y = this._target_y;
-
-        if(visible_part_height > 0) {
-            this._modal = false;
-            this._track_mouse = false;
-            y = this._target_y - this.actor.height + visible_part_height;
-        }
-        else {
-            if(!Main.pushModal(this.actor)) return;
-            this._modal = true;
-            this._track_mouse = true;
-        }
+        if(!Main.pushModal(this.actor)) return;
 
         this.actor.show();
         this._open = true;
@@ -189,21 +175,17 @@ const EverpadMenu = new Lang.Class({
         Tweener.addTween(this.actor, {
             time: MENU_ANIMATION_TIME / St.get_slow_down_factor(),
             transition: 'easeOutQuad',
-            y: y
+            y: this._target_y,
+            onComplete: Lang.bind(this, function() {
+                this._start_tracking_mouse();
+            })
         });
-
-        if(this._track_mouse) {
-            this._start_tracking_mouse();
-        }
     },
 
     hide: function() {
         if(!this._open) return;
 
-        if(this._modal) {
-            Main.popModal(this.actor);
-        }
-
+        Main.popModal(this.actor);
         this._open = false;
 
         Tweener.removeTweens(this.actor);
