@@ -15,7 +15,7 @@ const MESSAGE_TYPES = {
     success: 2
 };
 
-const MAX_MESSAGE_LENGTH = 60;
+const MAX_MESSAGE_LENGTH = 90;
 
 const StatusBarMessage = new Lang.Class({
     Name: 'StatusBarMessage',
@@ -91,6 +91,7 @@ const StatusBar = new Lang.Class({
         this.actor.add(this._spinner.actor);
         this.actor.add(this._message_label);
 
+        this._is_bloked = false;
         this._messages = {};
     },
 
@@ -157,6 +158,8 @@ const StatusBar = new Lang.Class({
     },
 
     add_message: function(message, timeout, type, has_spinner) {
+        if(this._is_bloked) return false;
+
         if(Utils.is_blank(message)) return false;
         message = new StatusBarMessage(message, timeout, type, has_spinner);
 
@@ -168,9 +171,13 @@ const StatusBar = new Lang.Class({
     },
 
     remove_message: function(id) {
+        if(this._is_bloked) return false;
+
         this.hide_message(id);
         delete this._messages[id];
         this.show_last();
+
+        return true;
     },
 
     remove_last: function() {
@@ -186,6 +193,14 @@ const StatusBar = new Lang.Class({
     clear: function() {
         this.actor.hide();
         this._messages = {};
+    },
+
+    block: function() {
+        this._is_bloked = true;
+    },
+
+    unblock: function() {
+        this._is_bloked = false;
     },
 
     destroy: function() {

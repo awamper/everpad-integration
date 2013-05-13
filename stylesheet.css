@@ -70,6 +70,46 @@
     padding-bottom: 3px;
 }
 
+.everpad-snippet-buttons-box {
+    size: 11px;
+}
+
+.everpad-snippet-buttons-bar-icon-box {
+    
+}
+
+.everpad-snippet-buttons-bar-icon {
+    icon-size: 15px;
+}
+
+.everpad-snippet-buttons-bar-button {
+    padding-right: 4px;
+    padding-top: 2px;
+    color: rgba(64, 64, 64, 1);
+}
+
+.everpad-snippet-buttons-bar-button:hover {
+    color: rgba(255, 64, 64, 1);
+}
+
+.everpad-snippet-buttons-bar-button:active {
+    color: rgba(255, 0, 0, 1);
+}
+
+.everpad-snippet-buttons-bar-toggle-button {
+    padding-right: 4px;
+    padding-top: 2px;
+    color: rgba(64, 64, 64, 1);
+}
+
+.everpad-snippet-buttons-bar-toggle-button:hover {
+    color: rgba(120, 255, 120, 1);
+}
+
+.everpad-snippet-buttons-bar-toggle-button:active {
+    color: rgba(0, 255, 0, 1);
+}
+
 .everpad-snippets-view-box {
     padding: 5px;
     spacing: 5px;

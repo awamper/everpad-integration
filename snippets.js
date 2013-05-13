@@ -14,6 +14,7 @@ const Utils = Me.imports.utils;
 const EverpadTypes = Me.imports.types;
 const DBus = Me.imports.dbus;
 const StatusBar = Me.imports.status_bar;
+const ButtonsBar = Me.imports.buttons_bar;
 
 const DATE_ANIMATION_TIME = 0.2;
 const SNIPPET_HINT_TIMEOUT = 1000;
@@ -29,7 +30,6 @@ const EverpadNoteSnippetBase = new Lang.Class({
 
     _title_text_size: 13,
     _date_text_size: 9,
-    _buttons_text_size: 9,
     _snippet_length: 0,
     _snippet_wrap: 0,
     _snippet_text_size: 0,
@@ -45,6 +45,8 @@ const EverpadNoteSnippetBase = new Lang.Class({
             this.note = note;
         }
 
+        this._clipboard = St.Clipboard.get_default();
+
         this.actor = new St.Table({
             style_class: 'everpad-snippet-box',
             homogeneous: false,
@@ -52,12 +54,22 @@ const EverpadNoteSnippetBase = new Lang.Class({
             reactive: true
         });
         this.actor.connect("enter-event", Lang.bind(this, function() {
+            if(this.actor.dont_show_message) return;
+
             this.actor.timeout_id = Mainloop.timeout_add(
                 SNIPPET_HINT_TIMEOUT,
                 Lang.bind(this, function() {
+                    let msg = "Left-click to open the note";
+
+                    if(!Utils.is_blank(this.note.share_url)) {
+                        msg +=
+                            ', right-click to copy the sharing ' +
+                            'url to the clipboard.'
+                    }
+
                     this.actor.statusbar_message_id =
                         Utils.get_status_bar().add_message(
-                            "Left-click to open the note.",
+                            msg,
                             0,
                             StatusBar.MESSAGE_TYPES.info
                         );
@@ -77,6 +89,17 @@ const EverpadNoteSnippetBase = new Lang.Class({
                 if(button === Clutter.BUTTON_PRIMARY) {
                     // this.actor.add_style_pseudo_class('active');
                     this.emit("clicked", this);
+                }
+                else if(button === Clutter.BUTTON_SECONDARY) {
+                    log(this.note.share_url);
+                    if(!Utils.is_blank(this.note.share_url)) {
+                        this._clipboard.set_text(this.note.share_url);
+                        Utils.get_status_bar().add_message(
+                            'The sharing url copied to the clipboard.',
+                            2000,
+                            StatusBar.MESSAGE_TYPES.success
+                        );
+                    }
                 }
             })
         );
@@ -202,6 +225,187 @@ const EverpadNoteSnippetBase = new Lang.Class({
         });
     },
 
+    _get_remove_button: function() {
+        let button_params = {
+            style_class: 'everpad-snippet-buttons-bar-button'
+        };
+
+        let button = this.buttons_bar.new_button(
+            'edit-delete-symbolic',
+            '',
+            button_params,
+            Lang.bind(this, Lang.bind(this, function() {
+                DBus.get_everpad_provider().delete_noteRemote(this.note.id,
+                    Lang.bind(this, function([result], error) {
+                        if(result !== null) {
+                            if(!result) {
+                                Utils.get_status_bar().add_message(
+                                    'Erorr',
+                                    3000,
+                                    StatusBar.MESSAGE_TYPES.error
+                                );
+                            }
+                        }
+                        else {
+                            log('delete_noteRemote(): '+error);
+                        }
+                    })
+                );
+            })));
+        button.connect('enter-event', Lang.bind(this, function() {
+            this.actor.dont_show_message = true;
+
+            let status_bar = Utils.get_status_bar();
+
+            button.message_id = status_bar.add_message(
+                'Remove the note.',
+                0,
+                StatusBar.MESSAGE_TYPES.info
+            );
+        }));
+        button.connect('leave-event', Lang.bind(this, function() {
+            this.actor.dont_show_message = false;
+
+            let status_bar = Utils.get_status_bar();
+
+            if(button.message_id > 0) {
+                status_bar.remove_message(button.message_id);
+            }
+        }));
+
+        return button;
+    },
+
+    _get_share_button: function() {
+        let button_params = {
+            style_class: 'everpad-snippet-buttons-bar-toggle-button',
+            toggle_mode: true
+        };
+
+        let button = this.buttons_bar.new_button(
+            'emblem-shared-symbolic',
+            '',
+            button_params,
+            Lang.bind(this, function() {
+                let checked = button.get_checked();
+                button.set_checked(checked);
+
+                if(!checked) {
+                    DBus.get_everpad_provider().stop_sharing_noteRemote(
+                        this.note.id
+                    );
+                    Utils.get_status_bar().add_message(
+                        'Stop sharing the note...',
+                        2000,
+                        StatusBar.MESSAGE_TYPES.info
+                    );
+                }
+                else {
+                    DBus.get_everpad_provider().share_noteRemote(
+                        this.note.id
+                    );
+                    Utils.get_status_bar().add_message(
+                        'Start sharing the note...',
+                        2000,
+                        StatusBar.MESSAGE_TYPES.info
+                    );
+                }
+            })
+        );
+        button.connect('enter-event', Lang.bind(this, function() {
+            this.actor.dont_show_message = true;
+
+            let checked = button.get_checked();
+            let status_bar = Utils.get_status_bar();
+
+            if(checked) {
+                button.message_id = status_bar.add_message(
+                    'Left-click to stop sharing.',
+                    0,
+                    StatusBar.MESSAGE_TYPES.info
+                );
+            }
+            else {
+                button.message_id = status_bar.add_message(
+                    'Share the note.',
+                    0,
+                    StatusBar.MESSAGE_TYPES.info
+                );
+            }
+        }));
+        button.connect('leave-event', Lang.bind(this, function() {
+            this.actor.dont_show_message = false;
+
+            let status_bar = Utils.get_status_bar();
+
+            if(button.message_id > 0) {
+                status_bar.remove_message(button.message_id);
+            }
+        }));
+
+        let checked = !Utils.is_blank(this.note.share_url);
+        button.set_checked(checked);
+
+        return button;
+    },
+
+    _get_pin_button: function() {
+        let button_params = {
+            style_class: 'everpad-snippet-buttons-bar-toggle-button',
+            toggle_mode: true
+        };
+
+        let button = this.buttons_bar.new_button(
+            'emblem-favorite-symbolic',
+            '',
+            button_params,
+            Lang.bind(this, function() {
+                let checked = button.get_checked();
+                button.set_checked(checked);
+
+                this.note.pinned = checked;
+                DBus.get_everpad_provider().update_noteRemote(
+                    this.note.for_dbus
+                );
+            })
+        );
+        button.connect('enter-event', Lang.bind(this, function() {
+            this.actor.dont_show_message = true;
+
+            let checked = button.get_checked();
+            let status_bar = Utils.get_status_bar();
+
+            if(checked) {
+                button.message_id = status_bar.add_message(
+                    'Unpin the note.',
+                    0,
+                    StatusBar.MESSAGE_TYPES.info
+                );
+            }
+            else {
+                button.message_id = status_bar.add_message(
+                    'Pin the note.',
+                    0,
+                    StatusBar.MESSAGE_TYPES.info
+                );
+            }
+        }));
+        button.connect('leave-event', Lang.bind(this, function() {
+            this.actor.dont_show_message = false;
+
+            let status_bar = Utils.get_status_bar();
+
+            if(button.message_id > 0) {
+                status_bar.remove_message(button.message_id);
+            }
+        }));
+
+        let checked = this.note.pinned;
+        button.set_checked(checked);
+
+        return button;
+    },
+
     make_icon: function() {
         this._get_note_resources(this.note.id,
             Lang.bind(this, function(resources) {
@@ -309,10 +513,16 @@ const EverpadNoteSnippetBase = new Lang.Class({
     },
 
     make_buttons: function() {
-        this.buttons = new St.Label({
-            text: 'Share | Link | Pin | Remove',
-            style: 'font-size: %spx'.format(this._buttons_text_size)
-        });
+        this.buttons_bar = new ButtonsBar.ButtonsBar();
+
+        let share_button = this._get_share_button();
+        this.buttons_bar.add_button(share_button);
+
+        let pin_button = this._get_pin_button();
+        this.buttons_bar.add_button(pin_button);
+
+        let remove_button = this._get_remove_button();
+        this.buttons_bar.add_button(remove_button);
     },
 
     destroy: function() {
@@ -344,7 +554,7 @@ const EverpadNoteSnippetSmall = new Lang.Class({
             x_align: St.Align.START,
             y_align: St.Align.END
         });
-        this.actor.add(this.buttons, {
+        this.actor.add(this.buttons_bar.actor, {
             row: 2,
             col: 1,
             expand: false,
@@ -390,7 +600,7 @@ const EverpadNoteSnippetMedium = new Lang.Class({
             x_align: St.Align.START,
             y_align: St.Align.END
         });
-        this.actor.add(this.buttons, {
+        this.actor.add(this.buttons_bar.actor, {
             row: 2,
             col: 1,
             expand: false,
@@ -440,7 +650,7 @@ const EverpadNoteSnippetBig = new Lang.Class({
             x_align: St.Align.START,
             y_align: St.Align.END
         });
-        this.actor.add(this.buttons, {
+        this.actor.add(this.buttons_bar.actor, {
             row: 2,
             col: 1,
             expand: false,

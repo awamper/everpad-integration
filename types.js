@@ -22,6 +22,26 @@ const EverpadNote = new Lang.Class({
         this.conflict_items = data[10];
         this.share_date = data[11];
         this.share_url = data[12];
+    },
+
+    get for_dbus() {
+        let result = [
+            this.id,
+            this.title,
+            this.content,
+            this.created,
+            this.updated,
+            this.notebook,
+            this.tags,
+            this.place,
+            this.pinned,
+            this.conflict_parent,
+            this.conflict_items,
+            this.share_date,
+            this.share_url
+        ];
+
+        return result;
     }
 });
 

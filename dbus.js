@@ -40,6 +40,24 @@ const EverpadProviderDBusIface =
             <arg type="a(issxxiassbiaixs)" direction="out" />
         </method>
 
+        <method name="update_note">
+            <arg type="(issxxiassbiaixs)" direction="in" />
+            <arg type="(issxxiassbiaixs)" direction="out" />
+        </method>
+
+        <method name="share_note">
+            <arg type="i" direction="in" />
+        </method>
+
+        <method name="stop_sharing_note">
+            <arg type="i" direction="in" />
+        </method>
+
+        <method name="delete_note">
+            <arg type="i" direction="in" />
+            <arg type="b" direction="out" />
+        </method>
+
         <method name="get_note_resources">
             <arg type="i" direction="in" />
             <arg type="a(issss)" direction="out" />
