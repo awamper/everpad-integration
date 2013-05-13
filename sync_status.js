@@ -1,6 +1,7 @@
 const St = imports.gi.St;
 const Lang = imports.lang;
 const Panel = imports.ui.panel;
+const Clutter = imports.gi.Clutter;
 const ExtensionUtils = imports.misc.extensionUtils;
 
 const Me = ExtensionUtils.getCurrentExtension();
@@ -27,10 +28,28 @@ const EverpadSyncStatus = new Lang.Class({
             y_align: St.Align.MIDDLE
         });
 
+        this._sync_button = new St.Icon({
+            icon_name: "emblem-synchronizing-symbolic",
+            style_class: 'everpad-sync-icon-button',
+            reactive: true
+        });
+        this._sync_button.connect("button-press-event", Lang.bind(this,
+            this._on_button_press
+        ));
+        this._sync_button.add_actor(this._sync_button);
+        this.actor.add(this._sync_button, {
+            row: 0,
+            col: 1,
+            expand: false,
+            x_fill: false,
+            y_fill: false,
+            x_align: St.Align.START,
+            y_align: St.Align.MIDDLE
+        });
+
         this._label = new St.Label({
             style_class: "everpad-sync-status-label"
         });
-        this.show_message("<span color='white' font='12' weight='bold'>Last sync: no data</span>", false)
         this.actor.add(this._label, {
             row: 0,
             col: 0,
@@ -40,6 +59,12 @@ const EverpadSyncStatus = new Lang.Class({
             x_align: St.Align.MIDDLE,
             y_align: St.Align.MIDDLE
         });
+        this.show_message(
+            "<span color='white' font='12' weight='bold'>" +
+            "Last sync: no data</span>",
+            false,
+            true
+        )
 
         this.progress_bar = new EverpadProgressBar.EverpadProgressBar();
         this.progress_bar.hide();
@@ -56,6 +81,14 @@ const EverpadSyncStatus = new Lang.Class({
         });
     },
 
+    _on_button_press: function(o, e) {
+        let button = e.get_button();
+
+        if(button === Clutter.BUTTON_PRIMARY) {
+            DBus.get_everpad_provider().syncRemote();
+        }
+    },
+
     check_status: function() {
         DBus.get_everpad_provider().is_first_syncedRemote(
             Lang.bind(this, function([result], error) {
@@ -70,8 +103,10 @@ const EverpadSyncStatus = new Lang.Class({
                                 if(is_first_synced) {
                                     if(status === Constants.STATUS_SYNC) {
                                         this.show_message(
-                                            "<span color='white' font='10' font-style='italic'>Sync in progress...</span>",
-                                            true
+                                            "<span color='white' font='10' font-style='italic'>" +
+                                            "Sync in progress...</span>",
+                                            true,
+                                            false
                                         );
                                     }
                                     else {
@@ -79,8 +114,10 @@ const EverpadSyncStatus = new Lang.Class({
                                             Lang.bind(this, function([result], error) {
                                                 if(result !== null) {
                                                     this.show_message(
-                                                        "<span color='white' font='12' weight='bold'>Last sync: %s</span>".format(result),
-                                                        false
+                                                        "<span color='white' font='12' weight='bold'>" +
+                                                        "Last sync: %s</span>".format(result),
+                                                        false,
+                                                        true
                                                     );
                                                 }
                                                 else {
@@ -93,18 +130,17 @@ const EverpadSyncStatus = new Lang.Class({
                                 else {
                                     if(status === Constants.STATUS_SYNC) {
                                         this.show_message(
-                                            "<span color='white' font='10'>Wait, first sync in progress...</span>",
-                                            true
+                                            "<span color='white' font='10'>Wait, first sync in " +
+                                            "progress...</span>",
+                                            true,
+                                            false
                                         );
                                     }
                                     else {
                                         let msg =
                                             "<span color='red' font-style='italic' font='10'>" +
                                             "Please perform first sync.</span>"
-                                        this.show_message(
-                                            msg,
-                                            false
-                                        );
+                                        this.show_message(msg, false, true);
                                     }
                                 }
                             }
@@ -121,8 +157,9 @@ const EverpadSyncStatus = new Lang.Class({
         );
     },
 
-    show_message: function(text, show_spinner) {
+    show_message: function(text, show_spinner, show_sync_button) {
         show_spinner = show_spinner || false;
+        show_sync_button = show_sync_button || false;
         this._label.clutter_text.set_markup(text);
 
         if(show_spinner) {
@@ -130,6 +167,13 @@ const EverpadSyncStatus = new Lang.Class({
         }
         else {
             this._spinner.actor.hide();
+        }
+
+        if(show_sync_button) {
+            this._sync_button.show();
+        }
+        else {
+            this._sync_button.hide();
         }
     },
 

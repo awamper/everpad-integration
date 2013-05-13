@@ -157,6 +157,10 @@
     padding-top: 3px;
 }
 
+.everpad-sync-icon-button {
+    icon-size: 17px;
+}
+
 .everpad-progress-bar-box {
     width: 150px;
     height: 15px;
