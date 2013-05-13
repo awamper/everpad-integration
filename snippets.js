@@ -271,16 +271,19 @@ const EverpadNoteSnippetBase = new Lang.Class({
             style: 'font-size: %spx'.format(this._date_text_size),
             reactive: true
         });
-        this.date.default_text = '<span weight="bold">%s</span>'.format(
-            new Date(this.note.created).toLocaleString()
-        )
-        this.date.hover_text = 'Modified: <span weight="bold">%s</span>'.format(
-            new Date(this.note.updated).toLocaleString()
-        );
+        this.date.default_text =
+            '<i><span weight="bold">%s</span></i>'.format(
+                new Date(this.note.created).toLocaleString()
+            )
+        this.date.hover_text =
+            '<i>Modified: <span weight="bold">%s</span></i>'.format(
+                new Date(this.note.updated).toLocaleString()
+            );
         this.date.clutter_text.set_markup(this.date.default_text);
         this.date.connect("enter-event", Lang.bind(this, function() {
             this.date.timeout_id = Mainloop.timeout_add(300,
                 Lang.bind(this, function() {
+                    this.date.hovered = true;
                     this._label_transition(
                         this.date,
                         this.date.hover_text,
@@ -294,7 +297,8 @@ const EverpadNoteSnippetBase = new Lang.Class({
                 Mainloop.source_remove(this.date.timeout_id);
             }
 
-            if(this.date.text === this.date.hover_text) {
+            if(this.date.hovered) {
+                this.date.hovered = false;
                 this._label_transition(
                     this.date,
                     this.date.default_text,
