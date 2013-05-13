@@ -118,9 +118,13 @@ const EverpadPanelButton = Lang.Class({
             y_fill: false,
             expand: false
         });
+        this._panel_progress_bar.actor.connect('show',
+            Lang.bind(this, function() {
+                this._reposition_progress_bar();
+            })
+        );
         this._panel_progress_bar.hide();
         Main.layoutManager.panelBox.add_actor(this._panel_progress_bar.actor);
-        this._reposition_progress_bar();
 
         this._syncing_in_progress = false;
         SIGNAL_IDS.sync_state =
@@ -154,10 +158,14 @@ const EverpadPanelButton = Lang.Class({
 
     _reposition_progress_bar: function() {
         let source_allocation = Shell.util_get_transformed_allocation(
-            this._button_box
+            this.actor
         );
-        this._panel_progress_bar.actor.x =
-            source_allocation.x1 - this._panel_progress_bar.actor.width;
+        let source_center_x = this.actor.width / 2;
+        let progress_center_x = this._panel_progress_bar.actor.width / 2;
+        let progress_x =
+            source_allocation.x1 + source_center_x - progress_center_x;
+
+        this._panel_progress_bar.actor.x = progress_x;
         this._panel_progress_bar.actor.y = this._button_box.height / 2;
     },
 
