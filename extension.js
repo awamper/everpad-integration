@@ -131,25 +131,32 @@ const EverpadPanelButton = Lang.Class({
         Main.layoutManager.panelBox.add_actor(this._panel_progress_bar.actor);
 
         this._syncing_in_progress = false;
+        this._progress_steps = 0;
         SIGNAL_IDS.sync_state =
             DBus.get_everpad_provider_signals().connectSignal(
                 'sync_state_changed',
                 Lang.bind(this, function(proxy, sender, [state]) {
                     if(state != SYNC_STATES.FINISH) {
                         this._syncing_in_progress = true;
+                        this._progress_steps++;
 
                         this._sync_status.check_status();
 
                         this._sync_status.progress_bar.show();
-                        this._sync_status.progress_bar.set_progress(state + 1);
+                        this._sync_status.progress_bar.set_progress(
+                            this._progress_steps
+                        );
 
                         this._panel_progress_bar.show();
-                        this._panel_progress_bar.set_progress(state + 1);
+                        this._panel_progress_bar.set_progress(
+                            this._progress_steps
+                        );
                         // this._show_spinner();
                     }
                     else {
                         // this._hide_spinner();
                         this._syncing_in_progress = false;
+                        this._progress_steps = 0;
 
                         this._panel_progress_bar.hide();
                         this._panel_progress_bar.reset();
