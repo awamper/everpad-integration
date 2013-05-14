@@ -35,6 +35,12 @@
     /*border: 1px solid rgba(255, 255, 255, 0.5);*/
 }
 
+.everpad-menu-icon {
+    icon-size: 20px;
+    color: rgba(64, 64, 64, 1);
+    padding-left: 5px;
+}
+
 .everpad-logo-label {
     color: rgb(150, 150, 150);
     font-size: 25px;
@@ -211,15 +217,15 @@
 
 .everpad-sync-icon-button-box {
     padding: 5px;
-    color: rgba(64, 64, 64, 1);
+    color: #3465a4;
 }
 
 .everpad-sync-icon-button-box:hover {
-    color: rgba(64, 64, 255, 1);
+    color: rgb(64, 64, 255);
 }
 
 .everpad-sync-icon-button-box:active {
-    color: rgba(0, 0, 255, 1);
+    color: rgb(0, 0, 255);
 }
 
 .everpad-sync-icon-button {

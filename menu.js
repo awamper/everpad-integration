@@ -120,7 +120,7 @@ const EverpadMenu = new Lang.Class({
         this.actor.destroy();
     },
 
-    add_menu_item: function(text, on_clicked) {
+    add_menu_item: function(text, icon_name, on_clicked) {
         if(Utils.is_blank(text)) return false;
 
         let button = new St.Button({
@@ -131,10 +131,31 @@ const EverpadMenu = new Lang.Class({
             on_clicked(button);
         }));
 
-        let button_bin = new St.Bin();
-        button_bin.add_actor(button);
+        let button_box = new St.BoxLayout();
 
-        this.actor.add(button_bin, {
+        if(!Utils.is_blank(icon_name)) {
+            let icon = new St.Icon({
+                icon_name: icon_name,
+                style_class: 'everpad-menu-icon'
+            });
+            button_box.add(icon, {
+                expand: false,
+                x_fill: false,
+                y_fill: false,
+                x_align: St.Align.START,
+                y_align: St.Align.MIDDLE
+            });
+        }
+
+        button_box.add(button, {
+            expand: false,
+            x_fill: false,
+            y_fill: false,
+            x_align: St.Align.START,
+            y_align: St.Align.MIDDLE
+        });
+
+        this.actor.add(button_box, {
             row: this.actor.row_count + 1,
             col: 0,
             x_fill: false,

@@ -21,6 +21,13 @@ const SYNC_STATES = Me.imports.constants.SYNC_STATES;
 const SYNC_STATES_TEXT = Me.imports.constants.SYNC_STATES_TEXT;
 const SHOW_MENU_DELAY = 300;
 
+const ICON_NAMES = {
+    create_note: 'text-editor-symbolic',
+    all_notes: 'emblem-documents-symbolic',
+    settings: 'preferences-other-symbolic',
+    exit: 'system-shutdown-symbolic'
+};
+
 const SIGNAL_IDS = {
     sync_state: 0,
     owner_changed: 0
@@ -185,26 +192,34 @@ const EverpadPanelButton = Lang.Class({
     },
 
     _add_menu_items: function() {
-        this._menu.add_menu_item("Create note", Lang.bind(this, function() {
-            DBus.get_everpad_app().createRemote();
-            this._menu.hide();
-            this._everpad.hide();
-        }));
-        this._menu.add_menu_item("All notes", Lang.bind(this, function() {
-            DBus.get_everpad_app().all_notesRemote();
-            this._menu.hide();
-            this._everpad.hide();
-        }));
-        this._menu.add_menu_item("Settings", Lang.bind(this, function() {
-            DBus.get_everpad_app().settingsRemote();
-            this._menu.hide();
-            this._everpad.hide();
-        }));
-        this._menu.add_menu_item("Exit", Lang.bind(this, function() {
-            DBus.get_everpad_app().killRemote();
-            this._menu.hide();
-            this._everpad.hide();
-        }));
+        this._menu.add_menu_item("Create note", ICON_NAMES.create_note,
+            Lang.bind(this, function() {
+                DBus.get_everpad_app().createRemote();
+                this._menu.hide();
+                this._everpad.hide();
+            })
+        );
+        this._menu.add_menu_item("All notes", ICON_NAMES.all_notes,
+            Lang.bind(this, function() {
+                DBus.get_everpad_app().all_notesRemote();
+                this._menu.hide();
+                this._everpad.hide();
+            })
+        );
+        this._menu.add_menu_item("Settings", ICON_NAMES.settings,
+            Lang.bind(this, function() {
+                DBus.get_everpad_app().settingsRemote();
+                this._menu.hide();
+                this._everpad.hide();
+            })
+        );
+        this._menu.add_menu_item("Exit", ICON_NAMES.exit,
+            Lang.bind(this, function() {
+                DBus.get_everpad_app().killRemote();
+                this._menu.hide();
+                this._everpad.hide();
+            })
+        );
     },
 
     _show_spinner: function() {
