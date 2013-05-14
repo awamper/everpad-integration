@@ -233,6 +233,11 @@
     border: 1px solid white;
 }
 
+.everpad-progress-bar-label {
+    font-size: 8px;
+    font-style: italic;
+}
+
 .everpad-progress-bar {
     background-color: #3465a4;
     border: 2px solid #3465a4;

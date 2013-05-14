@@ -22,3 +22,16 @@ const SYNC_STATES = {
     STOP_SHARE: 8,
     FINISH: 9
 };
+
+const SYNC_STATES_TEXT = {
+    0: "Starting synchronization...",
+    1: "Sending notebooks to server...",
+    2: "Sending tags to server...",
+    3: "Sending notes to server...",
+    4: "Receiving notebooks from server...",
+    5: "Receiving tags from server...",
+    6: "Receiving notes from server...",
+    7: "Sharing notes...",
+    8: "Stop sharing notes...",
+    9: "Finishing..."
+};

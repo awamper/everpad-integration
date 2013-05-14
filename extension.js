@@ -18,6 +18,7 @@ const EverpadProgressBar = Me.imports.progress_bar;
 const DBus = Me.imports.dbus;
 
 const SYNC_STATES = Me.imports.constants.SYNC_STATES;
+const SYNC_STATES_TEXT = Me.imports.constants.SYNC_STATES_TEXT;
 const SHOW_MENU_DELAY = 300;
 
 const SIGNAL_IDS = {
@@ -145,6 +146,9 @@ const EverpadPanelButton = Lang.Class({
                         this._sync_status.progress_bar.show();
                         this._sync_status.progress_bar.set_progress(
                             this._progress_steps
+                        );
+                        this._sync_status.progress_bar.set_progress_label(
+                            SYNC_STATES_TEXT[state]
                         );
 
                         this._panel_progress_bar.show();

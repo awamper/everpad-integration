@@ -13,14 +13,15 @@ const EverpadProgressBar = new Lang.Class({
             animation_time: 0.7,
             steps: 10,
             expand: false,
-            x_fill: true,
+            x_fill: false,
             y_fill: true,
-            x_align: St.Align.MIDDLE,
+            x_align: St.Align.START,
             y_align: St.Align.MIDDLE
         });
 
-        this.actor = new St.BoxLayout({
+        this.actor = new St.Table({
             style_class: this._params.box_style_class,
+            homogeneous: false
         });
 
         this.visible = true;
@@ -29,14 +30,32 @@ const EverpadProgressBar = new Lang.Class({
         });
 
         this.actor.add(this._progress_bar, {
+            row: 0,
+            col: 0,
             expand: this._params.expand,
             x_fill: this._params.x_fill,
             y_fill: this._params.y_fill,
-            x_align: St.Align.MIDDLE,
-            y_align: St.Align.MIDDLE
+            x_align: this._params.x_align,
+            y_align: this._params.y_align
         });
 
         this.reset();
+    },
+
+    _label_transition: function(label_actor, new_text, animation_time) {
+        Tweener.addTween(label_actor, {
+            time: animation_time,
+            transition: "easeOutQuad",
+            opacity: 50,
+            onComplete: Lang.bind(this, function() {
+                label_actor.clutter_text.set_markup(new_text);
+                Tweener.addTween(label_actor, {
+                    time: animation_time,
+                    transition: "easeOutQuad",
+                    opacity: 255
+                });
+            })
+        });
     },
 
     set_progress: function(progress) {
@@ -54,8 +73,31 @@ const EverpadProgressBar = new Lang.Class({
         });
     },
 
+    set_progress_label: function(text) {
+        if(!this._progress_label) {
+            this._progress_label = new St.Label({
+                style_class: 'everpad-progress-bar-label'
+            });
+            this.actor.add(this._progress_label, {
+                row: 0,
+                col: 0,
+                expand: false,
+                y_fill: false,
+                x_fill: false,
+                x_align: St.Align.MIDDLE,
+                y_align: St.Align.MIDDLE
+            });
+        }
+        this._progress_label.show();
+        this._label_transition(this._progress_label, text, 0.3);
+    },
+
     reset: function() {
         this._progress_bar.width = 0;
+
+        if(this._progress_label) {
+            this._progress_label.hide();
+        }
     },
 
     destroy: function() {
