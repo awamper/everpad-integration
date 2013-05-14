@@ -83,7 +83,7 @@ const EverpadNotesView = new Lang.Class({
     },
 
     set_notes: function(notes, snippet_type) {
-        this.snippets.clear();
+        //this.snippets.clear();
 
         for(let i = 0; i < notes.length; i++) {
             let note = notes[i];
