@@ -765,6 +765,7 @@ const EverpadSnippetsView = new Lang.Class({
             time: ANIMATION_TIMES.remove_snippet,
             transition: 'easeOutQuad',
             opacity: 0,
+            height: 0,
             onComplete: Lang.bind(this, function() {
                 snippet.actor.destroy();
             })
