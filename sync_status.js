@@ -28,13 +28,16 @@ const EverpadSyncStatus = new Lang.Class({
             y_align: St.Align.MIDDLE
         });
 
-        this._sync_button = new St.Icon({
+        this._sync_button = new St.Button({
+            style_class: 'everpad-sync-icon-button-box'
+        })
+        this._sync_button_icon = new St.Icon({
             icon_name: "emblem-synchronizing-symbolic",
-            style_class: 'everpad-sync-icon-button',
-            reactive: true
+            style_class: 'everpad-sync-icon-button'
         });
-        this._sync_button.connect("button-press-event", Lang.bind(this,
-            this._on_button_press
+        this._sync_button.add_actor(this._sync_button_icon);
+        this._sync_button.connect("clicked", Lang.bind(this,
+            this._on_button_clicked
         ));
         this.actor.add(this._sync_button, {
             row: 0,
@@ -80,12 +83,8 @@ const EverpadSyncStatus = new Lang.Class({
         });
     },
 
-    _on_button_press: function(o, e) {
-        let button = e.get_button();
-
-        if(button === Clutter.BUTTON_PRIMARY) {
-            DBus.get_everpad_provider().syncRemote();
-        }
+    _on_button_clicked: function() {
+        DBus.get_everpad_provider().syncRemote();
     },
 
     check_status: function() {

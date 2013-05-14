@@ -197,6 +197,19 @@
     padding-top: 3px;
 }
 
+.everpad-sync-icon-button-box {
+    padding: 5px;
+    color: rgba(64, 64, 64, 1);
+}
+
+.everpad-sync-icon-button-box:hover {
+    color: rgba(64, 64, 255, 1);
+}
+
+.everpad-sync-icon-button-box:active {
+    color: rgba(0, 0, 255, 1);
+}
+
 .everpad-sync-icon-button {
     icon-size: 17px;
 }
