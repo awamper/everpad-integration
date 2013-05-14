@@ -335,7 +335,7 @@ const EverpadNoteSnippetBase = new Lang.Class({
         };
 
         let button = this.buttons_bar.new_button(
-            'emblem-favorite-symbolic',
+            'bookmark-new-symbolic',
             '',
             button_params,
             Lang.bind(this, function() {
