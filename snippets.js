@@ -767,6 +767,10 @@ const EverpadSnippetsView = new Lang.Class({
         }
     },
 
+    get count() {
+        return this._snippets.length
+    },
+
     destroy: function() {
         for(let i = 0; i < this.snippets.length; i++) {
             let snippet = this.snippets[i];
