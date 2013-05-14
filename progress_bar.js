@@ -2,6 +2,10 @@ const St = imports.gi.St;
 const Lang = imports.lang;
 const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
+const ExtensionUtils = imports.misc.extensionUtils;
+
+const Me = ExtensionUtils.getCurrentExtension();
+const Utils = Me.imports.utils;
 
 const EverpadProgressBar = new Lang.Class({
     Name: "EverpadProgressBar",
@@ -42,22 +46,6 @@ const EverpadProgressBar = new Lang.Class({
         this.reset();
     },
 
-    _label_transition: function(label_actor, new_text, animation_time) {
-        Tweener.addTween(label_actor, {
-            time: animation_time,
-            transition: "easeOutQuad",
-            opacity: 50,
-            onComplete: Lang.bind(this, function() {
-                label_actor.clutter_text.set_markup(new_text);
-                Tweener.addTween(label_actor, {
-                    time: animation_time,
-                    transition: "easeOutQuad",
-                    opacity: 255
-                });
-            })
-        });
-    },
-
     set_progress: function(progress) {
         let box_border = this.actor.get_theme_node().get_length('border');
         let progress_border = this.actor.get_theme_node().get_length('border');
@@ -89,7 +77,7 @@ const EverpadProgressBar = new Lang.Class({
             });
         }
         this._progress_label.show();
-        this._label_transition(this._progress_label, text, 0.3);
+        Utils.label_transition(this._progress_label, text, 0.3);
     },
 
     reset: function() {

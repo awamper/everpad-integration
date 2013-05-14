@@ -204,22 +204,6 @@ const EverpadNoteSnippetBase = new Lang.Class({
         });
     },
 
-    _label_transition: function(label_actor, new_text, animation_time) {
-        Tweener.addTween(label_actor, {
-            time: animation_time,
-            transition: "easeOutQuad",
-            opacity: 50,
-            onComplete: Lang.bind(this, function() {
-                label_actor.clutter_text.set_markup(new_text);
-                Tweener.addTween(label_actor, {
-                    time: animation_time,
-                    transition: "easeOutQuad",
-                    opacity: 255
-                });
-            })
-        });
-    },
-
     _get_remove_button: function() {
         let button_params = {
             style_class: 'everpad-snippet-buttons-bar-button'
@@ -496,7 +480,7 @@ const EverpadNoteSnippetBase = new Lang.Class({
             this.date.timeout_id = Mainloop.timeout_add(300,
                 Lang.bind(this, function() {
                     this.date.hovered = true;
-                    this._label_transition(
+                    Utils.label_transition(
                         this.date,
                         this.date.hover_text,
                         DATE_ANIMATION_TIME
@@ -511,7 +495,7 @@ const EverpadNoteSnippetBase = new Lang.Class({
 
             if(this.date.hovered) {
                 this.date.hovered = false;
-                this._label_transition(
+                Utils.label_transition(
                     this.date,
                     this.date.default_text,
                     DATE_ANIMATION_TIME

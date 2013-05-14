@@ -7,7 +7,9 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Soup = imports.gi.Soup;
+const Lang = imports.lang;
 const Clutter = imports.gi.Clutter;
+const Tweener = imports.ui.tweener;
 
 const Me = ExtensionUtils.getCurrentExtension();
 const StatusBar = Me.imports.status_bar;
@@ -27,6 +29,22 @@ function destroy_status_bar() {
         STATUS_BAR.destroy();
         STATUS_BAR = null;
     }
+}
+
+function label_transition(label_actor, new_text, animation_time) {
+    Tweener.addTween(label_actor, {
+        time: animation_time,
+        transition: "easeOutQuad",
+        opacity: 50,
+        onComplete: Lang.bind(this, function() {
+            label_actor.clutter_text.set_markup(new_text);
+            Tweener.addTween(label_actor, {
+                time: animation_time,
+                transition: "easeOutQuad",
+                opacity: 255
+            });
+        })
+    });
 }
 
 function hash_code(string){
