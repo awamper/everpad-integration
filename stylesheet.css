@@ -63,6 +63,18 @@
     transition-duration: 300;
 }
 
+.everpad-snippet-box:updated {
+    background-color: rgba(255, 64, 64, 1);
+    color: white;
+    transition-duration: 300;
+}
+
+.everpad-snippet-box:added {
+    background-color: rgba(0, 200, 0, 1);
+    color: white;
+    transition-duration: 300;
+}
+
 .everpad-snippet-icon-box {
     padding-left: 3px;
     padding-right: 3px;

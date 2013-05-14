@@ -29,6 +29,26 @@ function destroy_status_bar() {
     }
 }
 
+function hash_code(string){
+    let result = string.split("").reduce(
+        function(a, b) {
+            a = ((a << 5) - a) + b.charCodeAt(0);
+            return a&a
+        },
+        0
+    );
+
+    return result;
+}
+
+function array_object_index_of(my_array, search_term, property) {
+    for(let i = 0; i < my_array.length; i++) {
+        if(my_array[i][property] === search_term) return i;
+    }
+
+    return -1;
+}
+
 function is_blank(str) {
     return (!str || /^\s*$/.test(str));
 }

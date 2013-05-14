@@ -70,7 +70,7 @@ const Everpad = new Lang.Class({
         );
 
         this.notes_view = new EverpadNotes.EverpadNotes();
-        this.notes_view.snippets.connect("snippet-clicked", Lang.bind(this,
+        this.notes_view.snippets_view.connect("snippet-clicked", Lang.bind(this,
             this._on_snipped_clicked
         ));
 
@@ -81,7 +81,7 @@ const Everpad = new Lang.Class({
         this.pinned_view.actor.connect("leave-event", Lang.bind(this, function() {
             this._hide_pinned_box();
         }));
-        this.pinned_view.snippets.connect("snippet-clicked",
+        this.pinned_view.snippets_view.connect("snippet-clicked",
             Lang.bind(this, this._on_snipped_clicked)
         );
 
@@ -263,20 +263,16 @@ const Everpad = new Lang.Class({
             this._remove_timeouts('search');
             TIMEOUT_IDS.search = Mainloop.timeout_add(SEARCH_DELAY,
                 Lang.bind(this, function() {
-                    this.notes_view.snippets.show_message(
-                        "Searching...",
+                    this.notes_view.set_label(
+                        EverpadNotes.LABELS.searching,
                         true
                     );
-                    // this.notes_view.set_label(
-                    //     EverpadNotes.LABELS.searching,
-                    //     true
-                    // );
                     this._search_notes(term);
                 })
             );
         }
         else {
-            this.notes_view.snippets.clear();
+            this.notes_view.snippets_view.clear();
         }
     },
 
@@ -295,7 +291,7 @@ const Everpad = new Lang.Class({
                     let notes = this._load_notes(result);
 
                     if(notes.length < 1) {
-                        this.notes_view.snippets.show_message(
+                        this.notes_view.snippets_view.show_message(
                             "Nothing found",
                             false
                         );
@@ -308,7 +304,7 @@ const Everpad = new Lang.Class({
                     }
                 }
                 else {
-                    this.notes_view.snippets.show_message(
+                    this.notes_view.snippets_view.show_message(
                         "Error: "+error,
                         false
                     );
@@ -332,11 +328,7 @@ const Everpad = new Lang.Class({
         if(!TRIGGERS.refresh_pinned) return;
 
         TRIGGERS.refresh_pinned = false;
-
-        this.pinned_view.snippets.show_message(
-            "Loading...",
-            true
-        );
+        this.pinned_view.set_label("Pinned notes", true);
 
         DBus.get_everpad_provider().find_notesRemote(
             '',
@@ -353,10 +345,10 @@ const Everpad = new Lang.Class({
                         notes,
                         EverpadNoteSnippet.EVERPAD_SNIPPET_TYPES.small
                     );
-                    this.pinned_view.set_label("Pinned notes");
+                    this.pinned_view.set_label("Pinned notes", false);
                 }
                 else {
-                    this.pinned_view.snippets.show_message("Error", false);
+                    this.pinned_view.snippets_view.show_message("Error", false);
                     log("show_pinned_notes(): " + error);
                 }
             })
@@ -367,9 +359,7 @@ const Everpad = new Lang.Class({
         if(!TRIGGERS.refresh_latest) return;
 
         TRIGGERS.refresh_latest = false;
-
-        this.notes_view.set_label(EverpadNotes.LABELS.latest, false);
-        this.notes_view.snippets.show_message("Loading...", true);
+        this.notes_view.set_label(EverpadNotes.LABELS.latest, true);
 
         DBus.get_everpad_provider().find_notesRemote(
             '',
@@ -381,11 +371,11 @@ const Everpad = new Lang.Class({
             0,
             Lang.bind(this, function(result, error) {
                 if(result != null) {
-                    this.notes_view.set_label(EverpadNotes.LABELS.latest);
+                    this.notes_view.set_label(EverpadNotes.LABELS.latest, false);
                     let notes = this._load_notes(result);
 
                     if(notes.length < 1) {
-                        this.notes_view.snippets.show_message(
+                        this.notes_view.snippets_view.show_message(
                             "Nothing found",
                             false
                         );
@@ -398,7 +388,7 @@ const Everpad = new Lang.Class({
                     }
                 }
                 else {
-                    this.notes_view.snippets.show_message(
+                    this.notes_view.snippets_view.show_message(
                         "Error: " + error,
                         false
                     );

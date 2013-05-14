@@ -9,7 +9,8 @@ const EverpadNotesView = Me.imports.notes_view;
 const LABELS = {
     latest: "Latest notes",
     search: "Search results",
-    searching: "Searching..."
+    searching: "Searching...",
+    loading: "Loading..."
 };
 
 const EverpadNotes = new Lang.Class({

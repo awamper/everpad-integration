@@ -24,10 +24,15 @@ const EVERPAD_SNIPPET_TYPES = {
     medium: 1,
     big: 2
 };
+const ANIMATION_TIMES = {
+    add_snippet: 0.5,
+    remove_snippet: 0.3
+};
 
 const EverpadNoteSnippetBase = new Lang.Class({
     Name: "EverpadNoteSnippetBase",
 
+    type: EVERPAD_SNIPPET_TYPES.medium,
     _title_text_size: 13,
     _date_text_size: 9,
     _snippet_length: 0,
@@ -38,13 +43,7 @@ const EverpadNoteSnippetBase = new Lang.Class({
     _icon_height: 120,
 
     _init: function(note) {
-        if(!note instanceof EverpadTypes.EverpadNote) {
-            throw new Error("not EverpadNote instance");
-        }
-        else {
-            this.note = note;
-        }
-
+        this.set_note(note);
         this._clipboard = St.Clipboard.get_default();
 
         this.actor = new St.Table({
@@ -79,16 +78,16 @@ const EverpadNoteSnippetBase = new Lang.Class({
             if(this.actor.timeout_id != 0) {
                 Mainloop.source_remove(this.actor.timeout_id);
             }
-
+            this.actor.remove_style_pseudo_class('updated');
             Utils.get_status_bar().remove_message(this.actor.statusbar_message_id);
         }));
         this.actor.connect("button-press-event",
             Lang.bind(this, function(o, e) {
                 let button = e.get_button();
+                this.actor.add_style_pseudo_class('active');
 
                 if(button === Clutter.BUTTON_PRIMARY) {
                     // this.actor.add_style_pseudo_class('active');
-                    this.emit("clicked", this);
                 }
                 else if(button === Clutter.BUTTON_SECONDARY) {
                     log(this.note.share_url);
@@ -103,20 +102,16 @@ const EverpadNoteSnippetBase = new Lang.Class({
                 }
             })
         );
-        // this.actor.connect("button-release-event",
-        //     Lang.bind(this, function(o, e) {
-        //         this.actor.remove_style_pseudo_class('active');
-        //     })
-        // );
+        this.actor.connect("button-release-event",
+            Lang.bind(this, function(o, e) {
+                let button = e.get_button();
+                this.actor.remove_style_pseudo_class('active');
 
-        this.make_title();
-        this.make_text();
-        this.make_date();
-        this.make_buttons();
-
-        if(this._show_icon) {
-            this.make_icon();
-        }
+                if(button === Clutter.BUTTON_PRIMARY) {
+                    this.emit("clicked", this);
+                }
+            })
+        );
     },
 
     _get_snippet: function(content, length, wrap) {
@@ -433,9 +428,12 @@ const EverpadNoteSnippetBase = new Lang.Class({
     },
 
     make_title: function() {
-        this.title = new St.Label({
-            style: 'font-size: %spx'.format(this._title_text_size),
-        });
+        if(!this.title) {
+            this.title = new St.Label({
+                style: 'font-size: %spx'.format(this._title_text_size),
+            });
+        }
+
         this.title.clutter_text.set_markup(
             '<span weight="bold">%s</span>'.format(
                 Utils.escape_html(this.note.title)
@@ -447,9 +445,11 @@ const EverpadNoteSnippetBase = new Lang.Class({
         markup = markup || '';
         text = text || '';
 
-        this.text = new St.Label({
-            style: 'font-size: %spx'.format(this._snippet_text_size)
-        });
+        if(!this.text) {
+            this.text = new St.Label({
+                style: 'font-size: %spx'.format(this._snippet_text_size)
+            });
+        }
 
         if(!Utils.is_blank(markup)) {
             this.text.clutter_text.set_markup(markup);
@@ -465,16 +465,24 @@ const EverpadNoteSnippetBase = new Lang.Class({
                     this._snippet_length,
                     this._snippet_wrap
                 );
-                this._show_text(snippet);
+                if(Utils.is_blank(snippet)) {
+                    this._show_text('No text');
+                }
+                else {
+                    this._show_text(snippet);
+                }
             }));
         }
     },
 
     make_date: function() {
-        this.date = new St.Label({
-            style: 'font-size: %spx'.format(this._date_text_size),
-            reactive: true
-        });
+        if(!this.date) {
+            this.date = new St.Label({
+                style: 'font-size: %spx'.format(this._date_text_size),
+                reactive: true
+            });
+        }
+
         this.date.default_text =
             '<i><span weight="bold">%s</span></i>'.format(
                 new Date(this.note.created).toLocaleString()
@@ -513,21 +521,41 @@ const EverpadNoteSnippetBase = new Lang.Class({
     },
 
     make_buttons: function() {
-        this.buttons_bar = new ButtonsBar.ButtonsBar();
+        if(!this.buttons_bar) {
+            this.buttons_bar = new ButtonsBar.ButtonsBar();
 
-        let share_button = this._get_share_button();
-        this.buttons_bar.add_button(share_button);
+            let share_button = this._get_share_button();
+            this.buttons_bar.add_button(share_button);
 
-        let pin_button = this._get_pin_button();
-        this.buttons_bar.add_button(pin_button);
+            let pin_button = this._get_pin_button();
+            this.buttons_bar.add_button(pin_button);
 
-        let remove_button = this._get_remove_button();
-        this.buttons_bar.add_button(remove_button);
+            let remove_button = this._get_remove_button();
+            this.buttons_bar.add_button(remove_button);
+        }
     },
 
     destroy: function() {
         this.note = null;
         this.actor.destroy();
+    },
+
+    set_note: function(note) {
+        if(!note instanceof EverpadTypes.EverpadNote) {
+            throw new Error("not EverpadNote instance");
+        }
+        else {
+            this.note = note;
+        }
+
+        this.make_title();
+        this.make_text();
+        this.make_date();
+        this.make_buttons();
+
+        if(this._show_icon) {
+            this.make_icon();
+        }
     }
 });
 Signals.addSignalMethods(EverpadNoteSnippetBase.prototype);
@@ -535,6 +563,8 @@ Signals.addSignalMethods(EverpadNoteSnippetBase.prototype);
 const EverpadNoteSnippetSmall = new Lang.Class({
     Name: "EverpadNoteSnippetSmall",
     Extends: EverpadNoteSnippetBase,
+
+    type: EVERPAD_SNIPPET_TYPES.small,
 
     _init: function(note) {
         this.parent(note);
@@ -570,6 +600,7 @@ const EverpadNoteSnippetMedium = new Lang.Class({
     Name: "EverpadNoteSnippetMedium",
     Extends: EverpadNoteSnippetBase,
 
+    type: EVERPAD_SNIPPET_TYPES.medium,
     _snippet_length: 350,
     _snippet_wrap: 105,
     _title_text_size: 14,
@@ -620,6 +651,7 @@ const EverpadNoteSnippetBig = new Lang.Class({
     Name: "EverpadNoteSnippetBig",
     Extends: EverpadNoteSnippetBase,
 
+    type: EVERPAD_SNIPPET_TYPES.big,
     _title_text_size: 15,
     _snippet_length: 600,
     _snippet_wrap: 120,
@@ -669,7 +701,7 @@ const EverpadNoteSnippetBig = new Lang.Class({
 const EverpadSnippetsView = new Lang.Class({
     Name: "EverpadSnippetsView",
 
-    _init: function(snippets) {
+    _init: function() {
         this.actor = new St.ScrollView();
         this._box = new St.BoxLayout({
             vertical: true,
@@ -677,29 +709,75 @@ const EverpadSnippetsView = new Lang.Class({
         });
         this.actor.add_actor(this._box);
 
-        this._snippets = snippets || [];
-        this._refresh();
+        this._snippets = [];
+        this._to_remove = [];
+        this._to_update = [];
+        this._to_add = [];
+
+        this.update_view();
     },
 
     _refresh: function() {
-        this._box.remove_all_children();
+        for(let i = 0; i < this._to_remove.length; i++) {
+            let snippet = this._to_remove[i];
+            this._remove_snippet(snippet);
+            this._snippets.splice(this._snippets.indexOf(snippet), 1);
+            this._to_remove.splice(this._to_remove.indexOf(snippet), 1);
+        }
+        for(let i = 0; i < this._to_add.length; i++) {
+            let snippet = this._to_add[i];
+            this._add_snippet(snippet);
+            this._snippets.push(snippet);
+            this._to_add.splice(this._to_add.indexOf(snippet), 1);
+        }
+        for(let i = 0; i < this._to_update.length; i++) {
+            let snippet = this._to_update[i];
+            this._update_snippet(snippet);
+            this._to_update.splice(this._to_update.indexOf(snippet), 1);
+        }
 
         if(this._snippets.length < 1) {
             this.show_message("No notes");
-            return
         }
-
-        for(let i = 0; i < this._snippets.length; i++) {
-            let snippet = this._snippets[i];
-            this._show_snippet(snippet);
+        else {
+            this.hide_message();
         }
     },
 
-    _show_snippet: function(snippet) {
+    _add_snippet: function(snippet) {
+        snippet.actor.opacity = 0;
         this._box.add(snippet.actor, {
             x_fill: true,
             x_align: St.Align.START
         });
+
+        Tweener.removeTweens(snippet.actor);
+        Tweener.addTween(snippet.actor, {
+            time: ANIMATION_TIMES.add_snippet,
+            transition: 'easeOutQuad',
+            opacity: 255
+        });
+    },
+
+    _remove_snippet: function(snippet) {
+        Tweener.removeTweens(snippet.actor);
+        Tweener.addTween(snippet.actor, {
+            time: ANIMATION_TIMES.remove_snippet,
+            transition: 'easeOutQuad',
+            opacity: 0,
+            onComplete: Lang.bind(this, function() {
+                snippet.actor.destroy();
+            })
+        });
+    },
+
+    _update_snippet: function(snippet) {
+        if(!snippet.updated_note) return;
+
+        Mainloop.idle_add(Lang.bind(this, function() {
+            snippet.set_note(snippet.updated_note);
+            snippet.actor.add_style_pseudo_class('updated');
+        }));
     },
 
     show_message: function(text, show_spinner) {
@@ -734,24 +812,60 @@ const EverpadSnippetsView = new Lang.Class({
         }
     },
 
-    add: function(snippet) {
+    add_snippet: function(snippet) {
         if(snippet instanceof EverpadNoteSnippetBase) {
             snippet.connect("clicked", Lang.bind(this, function(snippet) {
                 this.emit("snippet-clicked", snippet);
             }));
 
-            this._snippets.push(snippet);
-
-            if(this._snippets.length > 0) this.hide_message();
-            this._show_snippet(snippet);
+            this._to_add.push(snippet);
         }
         else {
             throw new Error('not EverpadNoteSnippetBase instance');
         }
     },
 
+    remove_snippet: function(note) {
+        let snippet = this.get_snippet_by_note_id(note.id);
+
+        if(snippet === -1) return false;
+        this._to_remove.push(snippet);
+
+        return true;
+    },
+
+    update_snippet: function(note) {
+        let snippet = this.get_snippet_by_note_id(note.id);
+
+        if(snippet === -1) return false;
+
+        if(note.hash !== snippet.note.hash) {
+            snippet.updated_note = note;
+            this._to_update.push(snippet);
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
+
+    get_snippet_by_note_id: function(note_id) {
+        for(let i = 0; i < this._snippets.length; i++) {
+            if(this._snippets[i].note.id === note_id) return this._snippets[i];
+        }
+
+        return -1;
+    },
+
     clear: function() {
         this._snippets = [];
+        this._to_remove = [];
+        this._to_add = [];
+        this._to_update = [];
+        this.update_view();
+    },
+
+    update_view: function() {
         this._refresh();
     },
 
@@ -759,16 +873,18 @@ const EverpadSnippetsView = new Lang.Class({
         return this._snippets;
     },
 
-    set snippets(snippets) {
-        this.clear();
-
-        for(let i = 0; i < snippets.length; i++) {
-            this.add(snippets[i]);
-        }
-    },
-
     get count() {
         return this._snippets.length
+    },
+
+    get notes() {
+        let notes = [];
+
+        for(let i = 0; i < this._snippets.length; i++) {
+            notes.push(this._snippets[i].note);
+        }
+
+        return notes;
     },
 
     destroy: function() {

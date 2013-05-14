@@ -1,4 +1,8 @@
 const Lang = imports.lang;
+const ExtensionUtils = imports.misc.extensionUtils;
+
+const Me = ExtensionUtils.getCurrentExtension();
+const Utils = Me.imports.utils;
 
 const NOTE_ORDER_TITLE = 0;
 const NOTE_ORDER_UPDATED = 1;
@@ -42,6 +46,19 @@ const EverpadNote = new Lang.Class({
         ];
 
         return result;
+    },
+
+    get hash() {
+        let string =
+            this.title +
+            this.content +
+            this.created +
+            this.updated +
+            this.pinned.toString() +
+            this.share_date +
+            this.share_url
+        let hash = Utils.hash_code(string);
+        return hash;
     }
 });
 
