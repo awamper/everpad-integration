@@ -259,6 +259,21 @@ const EverpadPanelButton = Lang.Class({
         }
     },
 
+    _destroy_everpad_proxies: function() {
+        if(DBus.EVERPAD_APP != null) {
+            DBus.EVERPAD_APP.run_dispose();
+            DBus.EVERPAD_APP = null;
+        }
+        if(DBus.EVERPAD_PROVIDER != null) {
+            DBus.EVERPAD_PROVIDER.run_dispose();
+            DBus.EVERPAD_PROVIDER = null;
+        }
+        if(DBus.EVERPAD_PROVIDER_SIGNALS != null) {
+            DBus.EVERPAD_PROVIDER_SIGNALS.run_dispose();
+            DBus.EVERPAD_PROVIDER_SIGNALS = null;
+        }
+    },
+
     destroy: function() {
         if(SIGNAL_IDS.sync_state > 0) {
             DBus.get_everpad_provider_signals().disconnectSignal(
@@ -268,7 +283,7 @@ const EverpadPanelButton = Lang.Class({
 
         this._sync_status.destroy();
         this._everpad.destroy();
-        DBus.destroy_dbus_proxies();
+        this._destroy_everpad_proxies();
         this.parent();
     }
 });
@@ -308,5 +323,6 @@ function disable() {
         DBus.get_dbus_control().disconnectSignal(SIGNAL_IDS.owner_changed);
     }
 
+    DBus.destroy_dbus_proxies();
     hide_button();
 }
