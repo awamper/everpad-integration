@@ -50,15 +50,17 @@ function hide_button() {
 function check_dbus(callback) {
     DBus.get_dbus_control().ListNamesRemote(
         Lang.bind(this, function(result, error) {
-            if(result != null) {
+            if(result !== null) {
+                let found = false;
+
                 for(let i = 0; i < result[0].length; i++) {
                     if(result[0][i] == 'com.everpad.App') {
-                        callback(true);
-                        return;
+                        found = true;
+                        break;
                     }
-
-                    callback(false);
                 }
+
+                callback(found);
             }
             else {
                 callback(false)
