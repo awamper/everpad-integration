@@ -753,7 +753,7 @@ const EverpadSnippetsView = new Lang.Class({
                 opacity: 0,
                 height: 0,
                 onComplete: Lang.bind(this, function() {
-                    snippet.actor.destroy();
+                    snippet.destroy();
                 })
             });
         }));
