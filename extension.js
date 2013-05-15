@@ -164,10 +164,8 @@ const EverpadPanelButton = Lang.Class({
                         this._panel_progress_bar.set_progress(
                             this._progress_steps
                         );
-                        // this._show_spinner();
                     }
                     else {
-                        // this._hide_spinner();
                         this._syncing_in_progress = false;
                         this._progress_steps = 0;
 
