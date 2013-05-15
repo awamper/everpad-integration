@@ -173,6 +173,8 @@ const EverpadPanelButton = Lang.Class({
 
                         this._panel_progress_bar.hide();
                         this._panel_progress_bar.reset();
+
+                        this._sync_status.check_status();
                         this._sync_status.progress_bar.hide();
                         this._sync_status.progress_bar.reset();
                     }
