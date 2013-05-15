@@ -153,6 +153,24 @@
     color: rgba(150, 150, 150, 1);
 }
 
+.everpad-search-entry-icon {
+    icon-size: 1em;
+    color: #8d8f8a;
+    transition-duration: 300;
+}
+
+.everpad-search-entry-icon:hover {
+    icon-size: 1em;
+    color: #3465a4;
+    transition-duration: 300;
+}
+
+.everpad-search-entry-icon:active {
+    icon-size: 1em;
+    color: rgba(0, 0, 255, 1);
+    transition-duration: 300;
+}
+
 .everpad-search-entry, .everpad-entry {
     color: rgb(64, 64, 64);
     caret-color: rgb(64, 64, 64);

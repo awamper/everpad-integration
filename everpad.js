@@ -68,6 +68,22 @@ const Everpad = new Lang.Class({
         this._search_entry.clutter_text.connect('text-changed',
             Lang.bind(this, this._on_search_text_changed)
         );
+        this._inactive_icon = new St.Icon({
+            style_class: 'everpad-search-entry-icon',
+            icon_name: 'edit-find-symbolic',
+            reactive: false
+        });
+        this._active_icon = new St.Icon({
+            style_class: 'everpad-search-entry-icon',
+            icon_name: 'edit-clear-symbolic',
+            reactive: true
+        });
+        this._search_entry.set_secondary_icon(this._inactive_icon);
+        this._search_entry.connect('secondary-icon-clicked',
+            Lang.bind(this, function() {
+                this._search_entry.set_text('');
+            })
+        );
 
         this.notes_view = new EverpadNotes.EverpadNotes();
         this.notes_view.snippets_view.connect("snippet-clicked", Lang.bind(this,
@@ -260,6 +276,7 @@ const Everpad = new Lang.Class({
         let hint_text = this._search_entry.hint_text;
 
         if(!Utils.is_blank(term) && term != hint_text) {
+            this._search_entry.set_secondary_icon(this._active_icon);
             this._remove_timeouts('search');
             TIMEOUT_IDS.search = Mainloop.timeout_add(SEARCH_DELAY,
                 Lang.bind(this, function() {
@@ -272,6 +289,7 @@ const Everpad = new Lang.Class({
             );
         }
         else {
+            this._search_entry.set_secondary_icon(this._inactive_icon);
             this.notes_view.snippets_view.clear();
         }
     },
