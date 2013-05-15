@@ -439,6 +439,7 @@ const Everpad = new Lang.Class({
     hide: function() {
         if(!this._open) return;
 
+        Utils.get_status_bar().clear();
         Main.popModal(this.actor);
         this._open = false;
 
