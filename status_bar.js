@@ -222,6 +222,10 @@ const StatusBar = new Lang.Class({
         this._is_bloked = false;
     },
 
+    is_empty: function() {
+        return Object.keys(this._messages).length === 0;
+    },
+
     destroy: function() {
         this.clear();
         this.actor.destroy();

@@ -53,11 +53,11 @@ const EverpadNoteSnippetBase = new Lang.Class({
             reactive: true
         });
         this.actor.connect("enter-event", Lang.bind(this, function() {
-            if(this.actor.dont_show_message) return;
-
             this.actor.timeout_id = Mainloop.timeout_add(
                 SNIPPET_HINT_TIMEOUT,
                 Lang.bind(this, function() {
+                    if(!Utils.get_status_bar().is_empty()) return;
+
                     let msg = "Left-click to open the note";
 
                     if(!Utils.is_blank(this.note.share_url)) {
@@ -232,8 +232,6 @@ const EverpadNoteSnippetBase = new Lang.Class({
                 );
             })));
         button.connect('enter-event', Lang.bind(this, function() {
-            this.actor.dont_show_message = true;
-
             let status_bar = Utils.get_status_bar();
 
             button.message_id = status_bar.add_message(
@@ -243,8 +241,6 @@ const EverpadNoteSnippetBase = new Lang.Class({
             );
         }));
         button.connect('leave-event', Lang.bind(this, function() {
-            this.actor.dont_show_message = false;
-
             let status_bar = Utils.get_status_bar();
 
             if(button.message_id > 0) {
@@ -274,7 +270,7 @@ const EverpadNoteSnippetBase = new Lang.Class({
                     );
                     Utils.get_status_bar().add_message(
                         'Stop sharing the note...',
-                        2000,
+                        4000,
                         StatusBar.MESSAGE_TYPES.info
                     );
                 }
@@ -284,15 +280,13 @@ const EverpadNoteSnippetBase = new Lang.Class({
                     );
                     Utils.get_status_bar().add_message(
                         'Start sharing the note...',
-                        2000,
+                        4000,
                         StatusBar.MESSAGE_TYPES.info
                     );
                 }
             })
         );
         button.connect('enter-event', Lang.bind(this, function() {
-            this.actor.dont_show_message = true;
-
             let checked = button.get_checked();
             let status_bar = Utils.get_status_bar();
 
@@ -312,8 +306,6 @@ const EverpadNoteSnippetBase = new Lang.Class({
             }
         }));
         button.connect('leave-event', Lang.bind(this, function() {
-            this.actor.dont_show_message = false;
-
             let status_bar = Utils.get_status_bar();
 
             if(button.message_id > 0) {
@@ -348,8 +340,6 @@ const EverpadNoteSnippetBase = new Lang.Class({
             })
         );
         button.connect('enter-event', Lang.bind(this, function() {
-            this.actor.dont_show_message = true;
-
             let checked = button.get_checked();
             let status_bar = Utils.get_status_bar();
 
@@ -369,8 +359,6 @@ const EverpadNoteSnippetBase = new Lang.Class({
             }
         }));
         button.connect('leave-event', Lang.bind(this, function() {
-            this.actor.dont_show_message = false;
-
             let status_bar = Utils.get_status_bar();
 
             if(button.message_id > 0) {
