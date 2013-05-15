@@ -4,6 +4,8 @@ const Panel = imports.ui.panel;
 const Tweener = imports.ui.tweener;
 const Mainloop = imports.mainloop;
 const Params = imports.misc.params;
+const Signals = imports.signals;
+const Clutter = imports.gi.Clutter;
 const ExtensionUtils = imports.misc.extensionUtils;
 
 const Me = ExtensionUtils.getCurrentExtension();
@@ -81,7 +83,21 @@ const StatusBar = new Lang.Class({
             style_class: 'everpad-statusbar-box',
             visible: false
         });
-        this._message_label = new St.Label();
+        this._message_label = new St.Label({
+            reactive: true
+        });
+        this._message_label.connect('button-release-event',
+            Lang.bind(this, function(o, e) {
+                let button = e.get_button();
+
+                if(button === Clutter.BUTTON_PRIMARY) {
+                    this.emit('message-clicked', this._current_message);
+                }
+                else if(button === Clutter.BUTTON_SECONDARY) {
+                    this.remove_message(this._current_message.id);
+                }
+            })
+        );
         this._message_label.get_clutter_text().use_markup = true;
         this._spinner = new Panel.AnimatedIcon(
             'process-working.svg',
@@ -93,6 +109,7 @@ const StatusBar = new Lang.Class({
 
         this._is_bloked = false;
         this._messages = {};
+        this._current_message = null;
     },
 
     _get_max_id: function() {
@@ -111,6 +128,8 @@ const StatusBar = new Lang.Class({
         let message = this._messages[id];
         if(message === undefined || !message instanceof StatusBarMessage) return;
 
+        this._current_message = message;
+        this._current_message.id = id;
         this._message_label.get_clutter_text().set_markup(message.markup);
 
         this.actor.opacity = 0;
@@ -208,3 +227,4 @@ const StatusBar = new Lang.Class({
         this.actor.destroy();
     }
 });
+Signals.addSignalMethods(StatusBar.prototype);
