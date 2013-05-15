@@ -305,16 +305,19 @@ const Everpad = new Lang.Class({
             -1,
             Lang.bind(this, function(result, error) {
                 if(result != null) {
-                    this.notes_view.set_label(EverpadNotes.LABELS.search);
                     let notes = this._load_notes(result);
 
                     if(notes.length < 1) {
+                        this.notes_view.set_label(EverpadNotes.LABELS.search);
                         this.notes_view.snippets_view.show_message(
                             "Nothing found",
                             false
                         );
                     }
                     else {
+                        this.notes_view.set_label(
+                            EverpadNotes.LABELS.search + '(%s)'.format(notes.length)
+                        );
                         this.notes_view.set_notes(
                             notes,
                             EverpadNoteSnippet.EVERPAD_SNIPPET_TYPES.medium
