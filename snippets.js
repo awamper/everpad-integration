@@ -267,7 +267,6 @@ const EverpadNoteSnippetBase = new Lang.Class({
             button_params,
             Lang.bind(this, function() {
                 let checked = button.get_checked();
-                button.set_checked(checked);
 
                 if(!checked) {
                     DBus.get_everpad_provider().stop_sharing_noteRemote(
