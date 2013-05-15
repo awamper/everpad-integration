@@ -728,31 +728,35 @@ const EverpadSnippetsView = new Lang.Class({
     },
 
     _add_snippet: function(snippet) {
-        snippet.actor.opacity = 0;
-        this._box.add(snippet.actor, {
-            x_fill: true,
-            x_align: St.Align.START
-        });
+        Mainloop.idle_add(Lang.bind(this, function() {
+            snippet.actor.opacity = 0;
+            this._box.add(snippet.actor, {
+                x_fill: true,
+                x_align: St.Align.START
+            });
 
-        Tweener.removeTweens(snippet.actor);
-        Tweener.addTween(snippet.actor, {
-            time: ANIMATION_TIMES.add_snippet,
-            transition: 'easeOutQuad',
-            opacity: 255
-        });
+            Tweener.removeTweens(snippet.actor);
+            Tweener.addTween(snippet.actor, {
+                time: ANIMATION_TIMES.add_snippet,
+                transition: 'easeOutQuad',
+                opacity: 255
+            });
+        }));
     },
 
     _remove_snippet: function(snippet) {
-        Tweener.removeTweens(snippet.actor);
-        Tweener.addTween(snippet.actor, {
-            time: ANIMATION_TIMES.remove_snippet,
-            transition: 'easeOutQuad',
-            opacity: 0,
-            height: 0,
-            onComplete: Lang.bind(this, function() {
-                snippet.actor.destroy();
-            })
-        });
+        Mainloop.idle_add(Lang.bind(this, function() {
+            Tweener.removeTweens(snippet.actor);
+            Tweener.addTween(snippet.actor, {
+                time: ANIMATION_TIMES.remove_snippet,
+                transition: 'easeOutQuad',
+                opacity: 0,
+                height: 0,
+                onComplete: Lang.bind(this, function() {
+                    snippet.actor.destroy();
+                })
+            });
+        }));
     },
 
     _update_snippet: function(snippet) {
