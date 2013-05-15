@@ -473,7 +473,6 @@ const Everpad = new Lang.Class({
             );
         }
 
-        Utils.destroy_status_bar();
         this.actor.destroy();
         this.notes_view.destroy();
         this.pinned_view.destroy();

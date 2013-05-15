@@ -283,9 +283,11 @@ const EverpadPanelButton = Lang.Class({
             );
         }
 
-        this._sync_status.destroy();
+        this._menu.destroy();
         this._everpad.destroy();
+        this._sync_status.destroy();
         this._destroy_everpad_proxies();
+        Utils.destroy_status_bar();
         this.parent();
     }
 });
@@ -325,6 +327,6 @@ function disable() {
         DBus.get_dbus_control().disconnectSignal(SIGNAL_IDS.owner_changed);
     }
 
-    DBus.destroy_dbus_proxies();
     hide_button();
+    DBus.destroy_dbus_proxies();
 }

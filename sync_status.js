@@ -176,8 +176,8 @@ const EverpadSyncStatus = new Lang.Class({
     },
 
     destroy: function() {
-        this.actor.destroy();
         this.progress_bar.destroy();
         this._spinner = null;
+        this.actor.destroy();
     }
 });
