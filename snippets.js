@@ -854,6 +854,54 @@ const EverpadSnippetsView = new Lang.Class({
         this._refresh();
     },
 
+    scroll_to: function(value) {
+        let adjustment = this.actor.vscroll.adjustment;
+
+        if(value === adjustment.value) return;
+
+        let step_min = 5;
+        let step_max = 150;
+        let scroll_to_bottom = value > adjustment.value ? true : false
+
+        Mainloop.timeout_add(30, Lang.bind(this, function() {
+            let diff = Math.ceil(Math.abs(adjustment.value - value));
+            let step = Math.max(Math.min(diff / 10, step_max), step_min);
+
+            if(scroll_to_bottom) {
+                adjustment.value = adjustment.value + step;
+                return adjustment.value >= value ? false : true;
+            }
+            else {
+                adjustment.value = adjustment.value - step;
+                return adjustment.value <= value ? false : true;
+            }
+        }));
+    },
+
+    scroll_to_first_updated: function() {
+        let updated_index = -1;
+        let children = this._box.get_children();
+
+        for(let i = 0; i < children.length; i++) {
+            let pseudo_class = children[i].get_style_pseudo_class() || '';
+
+            if(pseudo_class.indexOf('updated') !== -1) {
+                updated_index = i;
+                break;
+            }
+        }
+
+        if(updated_index === -1) return false;
+
+        let adjustment = this.actor.vscroll.adjustment;
+        let position = Math.ceil(
+            adjustment.page_size / children.length * updated_index
+        );
+        this.scroll_to(position);
+
+        return true;
+    },
+
     get snippets() {
         return this._snippets;
     },
