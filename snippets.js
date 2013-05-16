@@ -119,6 +119,11 @@ const EverpadNoteSnippetBase = new Lang.Class({
                 }
             })
         );
+
+        this.connect("note-changed", Lang.bind(this, function(object, new_note) {
+            this._share_button.set_checked(!Utils.is_blank(new_note.share_url));
+            this._pin_button.set_checked(new_note.pinned);
+        }));
     },
 
     _get_snippet: function(content, length, wrap) {
@@ -542,14 +547,14 @@ const EverpadNoteSnippetBase = new Lang.Class({
         if(!this.buttons_bar) {
             this.buttons_bar = new ButtonsBar.ButtonsBar();
 
-            let share_button = this._get_share_button();
-            this.buttons_bar.add_button(share_button);
+            this._share_button = this._get_share_button();
+            this.buttons_bar.add_button(this._share_button);
 
-            let pin_button = this._get_pin_button();
-            this.buttons_bar.add_button(pin_button);
+            this._pin_button = this._get_pin_button();
+            this.buttons_bar.add_button(this._pin_button);
 
-            let remove_button = this._get_remove_button();
-            this.buttons_bar.add_button(remove_button);
+            this._remove_button = this._get_remove_button();
+            this.buttons_bar.add_button(this._remove_button);
         }
     },
 
@@ -575,6 +580,8 @@ const EverpadNoteSnippetBase = new Lang.Class({
         if(this._show_icon) {
             this.make_icon();
         }
+
+        this.emit("note-changed", this.note);
     }
 });
 Signals.addSignalMethods(EverpadNoteSnippetBase.prototype);
