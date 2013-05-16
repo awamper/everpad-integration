@@ -35,3 +35,11 @@ const SYNC_STATES_TEXT = {
     8: "Stop sharing notes...",
     9: "Finishing..."
 };
+
+const ICON_NAMES = {
+    create_note: 'text-editor-symbolic',
+    all_notes: 'emblem-documents-symbolic',
+    settings: 'preferences-other-symbolic',
+    exit: 'system-shutdown-symbolic',
+    notebook: 'folder-documents-symbolic'
+};

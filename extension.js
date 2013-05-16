@@ -21,12 +21,7 @@ const SYNC_STATES = Me.imports.constants.SYNC_STATES;
 const SYNC_STATES_TEXT = Me.imports.constants.SYNC_STATES_TEXT;
 const SHOW_MENU_DELAY = 300;
 
-const ICON_NAMES = {
-    create_note: 'text-editor-symbolic',
-    all_notes: 'emblem-documents-symbolic',
-    settings: 'preferences-other-symbolic',
-    exit: 'system-shutdown-symbolic'
-};
+const ICON_NAMES = Me.imports.constants.ICON_NAMES;
 
 const SIGNAL_IDS = {
     sync_state: 0,
