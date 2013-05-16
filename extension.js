@@ -20,8 +20,9 @@ const DBus = Me.imports.dbus;
 const SYNC_STATES = Me.imports.constants.SYNC_STATES;
 const SYNC_STATES_TEXT = Me.imports.constants.SYNC_STATES_TEXT;
 const SHOW_MENU_DELAY = 300;
-
 const ICON_NAMES = Me.imports.constants.ICON_NAMES;
+const SPINNER_ICON = Me.imports.constants.SPINNER_ICON;
+const SPINNER_ICON_SIZE = Me.imports.constants.SPINNER_ICON_SIZE;
 
 const SIGNAL_IDS = {
     sync_state: 0,
@@ -224,15 +225,15 @@ const EverpadPanelButton = Lang.Class({
     _show_spinner: function() {
         if(this._spinner != null) return;
 
-        this._spinner = new Panel.AnimatedIcon('process-working.svg', 24)
-        this._spinner.actor.show();
+        this._spinner = new Panel.AnimatedIcon(SPINNER_ICON, SPINNER_ICON_SIZE);
+        this._spinner.play();
         this._button_box.remove_all_children();
         this._button_box.add_actor(this._spinner.actor);
     },
 
     _hide_spinner: function() {
-        this._spinner.actor.destroy();
-        this._button_box.remove_all_children();
+        this._spinner.destroy();
+        this._button_box.destroy_all_children();
         this._button_box.add_actor(this._label);
     },
 

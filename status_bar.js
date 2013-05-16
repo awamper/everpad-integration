@@ -11,6 +11,9 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Utils = Me.imports.utils;
 
+const SPINNER_ICON = Me.imports.constants.SPINNER_ICON;
+const SPINNER_ICON_SIZE = Me.imports.constants.SPINNER_ICON_SIZE;
+
 const MESSAGE_TYPES = {
     error: 0,
     info: 1,
@@ -100,9 +103,10 @@ const StatusBar = new Lang.Class({
         );
         this._message_label.get_clutter_text().use_markup = true;
         this._spinner = new Panel.AnimatedIcon(
-            'process-working.svg',
-            24
+            SPINNER_ICON,
+            SPINNER_ICON_SIZE
         );
+        this._spinner.actor.hide();
 
         this.actor.add(this._spinner.actor);
         this.actor.add(this._message_label);
@@ -137,9 +141,11 @@ const StatusBar = new Lang.Class({
 
         if(message.has_spinner) {
             this._spinner.actor.show();
+            this._spinner.play();
         }
         else {
             this._spinner.actor.hide();
+            this._spinner.stop();
         }
 
         Tweener.addTween(this.actor, {

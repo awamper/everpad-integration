@@ -17,7 +17,11 @@ const EverpadSyncStatus = new Lang.Class({
             homogeneous: false
         });
 
-        this._spinner = new Panel.AnimatedIcon('process-working.svg', 24);
+        this._spinner = new Panel.AnimatedIcon(
+            Constants.SPINNER_ICON,
+            Constants.SPINNER_ICON_SIZE
+        );
+        this._spinner.actor.hide();
         this.actor.add(this._spinner.actor, {
             row: 0,
             col: 1,
@@ -162,9 +166,11 @@ const EverpadSyncStatus = new Lang.Class({
 
         if(show_spinner) {
             this._spinner.actor.show();
+            this._spinner.play();
         }
         else {
             this._spinner.actor.hide();
+            this._spinner.stop();
         }
 
         if(show_sync_button) {

@@ -9,6 +9,9 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Utils = Me.imports.utils;
 const EverpadSnippets = Me.imports.snippets;
 
+const SPINNER_ICON = Me.imports.constants.SPINNER_ICON;
+const SPINNER_ICON_SIZE = Me.imports.constants.SPINNER_ICON_SIZE;
+
 const EverpadNotesView = new Lang.Class({
     Name: "EverpadNotesView",
 
@@ -32,7 +35,9 @@ const EverpadNotesView = new Lang.Class({
             text: this._params.default_label,
             style_class: this._params.label_style_class
         });
-        this._spinner = new Panel.AnimatedIcon('process-working.svg', 24);
+        this._spinner = new Panel.AnimatedIcon(SPINNER_ICON, SPINNER_ICON_SIZE);
+        this._spinner.actor.hide();
+
         this.snippets_view = new EverpadSnippets.EverpadSnippetsView();
 
         this.actor.add(this._label, {
@@ -120,9 +125,11 @@ const EverpadNotesView = new Lang.Class({
 
         if(show_spinner) {
             this._spinner.actor.show();
+            this._spinner.play();
         }
         else {
             this._spinner.actor.hide();
+            this._spinner.stop();
         }
     },
 

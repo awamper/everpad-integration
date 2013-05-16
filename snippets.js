@@ -16,6 +16,8 @@ const DBus = Me.imports.dbus;
 const StatusBar = Me.imports.status_bar;
 const ButtonsBar = Me.imports.buttons_bar;
 
+const SPINNER_ICON = Me.imports.constants.SPINNER_ICON;
+const SPINNER_ICON_SIZE = Me.imports.constants.SPINNER_ICON_SIZE;
 const ICON_NAMES = Me.imports.constants.ICON_NAMES;
 const DATE_ANIMATION_TIME = 0.2;
 const SNIPPET_HINT_TIMEOUT = 1000;
@@ -804,7 +806,7 @@ const EverpadSnippetsView = new Lang.Class({
 
     show_message: function(text, show_spinner) {
         show_spinner = show_spinner || false;
-        this._box.remove_all_children();
+        this._box.destroy_all_children();
 
         this._message_bin = new St.BoxLayout();
         this._box.add(this._message_bin, {
@@ -822,8 +824,8 @@ const EverpadSnippetsView = new Lang.Class({
         this._message_bin.add_actor(message);
 
         if(show_spinner) {
-            let spinner = new Panel.AnimatedIcon('process-working.svg', 24);
-            spinner.actor.show();
+            let spinner = new Panel.AnimatedIcon(SPINNER_ICON, SPINNER_ICON_SIZE);
+            spinner.play();
             this._message_bin.add_actor(spinner.actor);
         }
     },

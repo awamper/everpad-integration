@@ -43,3 +43,6 @@ const ICON_NAMES = {
     exit: 'system-shutdown-symbolic',
     notebook: 'folder-documents-symbolic'
 };
+
+const SPINNER_ICON = global.datadir + '/theme/process-working.svg';
+const SPINNER_ICON_SIZE = 24;
