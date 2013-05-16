@@ -29,6 +29,8 @@ const SIGNAL_IDS = {
 };
 
 function show_button() {
+    if(Main.sessionMode.currentMode !== 'user') return;
+
     everpad_button = new EverpadPanelButton();
 
     Everpad.TRIGGERS.refresh_latest = true;
@@ -70,7 +72,7 @@ const EverpadPanelButton = Lang.Class({
     Extends: PanelMenu.Button,
 
     _init: function() {
-        this.parent(0.0, 'everpad');
+        this.parent(0.0, 'everpad', false);
         this.actor.reactive = false;
         Main.panel.addToStatusArea('everpad', this);
 
