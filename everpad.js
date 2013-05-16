@@ -432,7 +432,11 @@ const Everpad = new Lang.Class({
         Tweener.addTween(this.actor, {
             time: EVERPAD_ANIMATION_TIME / St.get_slow_down_factor(),
             transition: 'easeOutQuad',
-            y: this._target_y
+            y: this._target_y,
+            onComplete: Lang.bind(this, function() {
+                this.refresh_pinned_notes();
+                this.refresh_latest_notes();
+            })
         });
     },
 
@@ -460,9 +464,6 @@ const Everpad = new Lang.Class({
         }
         else {
             this.show();
-
-            this.refresh_pinned_notes();
-            this.refresh_latest_notes();
         }
     },
 
