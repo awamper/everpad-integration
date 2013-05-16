@@ -128,7 +128,7 @@ const EverpadSyncStatus = new Lang.Class({
                                 else {
                                     if(status === Constants.STATUS_SYNC) {
                                         this.show_message(
-                                            "<span color='white' font='10'>Wait, first sync in " +
+                                            "<span color='white' font='8'>Wait, first sync in " +
                                             "progress...</span>",
                                             true,
                                             false
