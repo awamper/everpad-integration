@@ -94,7 +94,10 @@ const EverpadNoteSnippetBase = new Lang.Class({
                 else if(button === Clutter.BUTTON_SECONDARY) {
                     log(this.note.share_url);
                     if(!Utils.is_blank(this.note.share_url)) {
-                        this._clipboard.set_text(this.note.share_url);
+                        this._clipboard.set_text(
+                            St.ClipboardType.CLIPBOARD,
+                            this.note.share_url
+                        );
                         Utils.get_status_bar().add_message(
                             'The sharing url copied to the clipboard.',
                             2000,
