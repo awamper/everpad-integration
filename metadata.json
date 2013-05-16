@@ -3,6 +3,7 @@
         "3.8"
     ],
     "uuid": "everpad_integration@awamper.gmail.com",
+    "url": "https://github.com/awamper/everpad-integration",
     "name": "Everpad Integration",
-    "description": "Everpad with gnome-shell integration"
+    "description": "Integration Everpad (https://github.com/nvbn/everpad) with gnome-shell.\n\n\nPanel icon:\n- Place your mouse over the icon to see the menu.\n- Left-click on the icon opens Everpad.\n- Click on the icon with the mouse wheel - sync.\n- Right-click opens Everpad Snippets with the latest notes.\nSnippets:\n- Move the cursor to the right of the screen to see your pinned notes.\n- Start typing to search for notes, <Esc> to exit the search.\n- Place your mouse over the date to see the time of last modification.\n- Left-click on the snippet opens the note to Everpad.\n- Right-click copy the share URL (if any) to the clipboard."
 }
