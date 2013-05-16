@@ -3,6 +3,7 @@ const Lang = imports.lang;
 const Shell = imports.gi.Shell;
 const PointerWatcher = imports.ui.pointerWatcher;
 const Params = imports.misc.params;
+const Clutter = imports.gi.Clutter;
 const Tweener = imports.ui.tweener;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Main = imports.ui.main;
@@ -23,6 +24,9 @@ const EverpadMenu = new Lang.Class({
             style_class: 'everpad-menu-box',
             reactive: true
         });
+        this.actor.connect('key-press-event', Lang.bind(this,
+            this._on_key_press_event)
+        );
         this._menu_box = new St.Table({
             homogeneous: false
         });
@@ -70,6 +74,17 @@ const EverpadMenu = new Lang.Class({
         this._is_hover = false;
 
         this._resize();
+    },
+
+    _on_key_press_event: function(o, e) {
+        let symbol = e.get_key_symbol()
+
+        if(symbol === Clutter.Escape) {
+            this.hide();
+            return true;
+        }
+
+        return false;
     },
 
     _resize: function() {
