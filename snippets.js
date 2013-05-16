@@ -16,6 +16,7 @@ const DBus = Me.imports.dbus;
 const StatusBar = Me.imports.status_bar;
 const ButtonsBar = Me.imports.buttons_bar;
 
+const ICON_NAMES = Me.imports.constants.ICON_NAMES;
 const DATE_ANIMATION_TIME = 0.2;
 const SNIPPET_HINT_TIMEOUT = 1000;
 
@@ -35,6 +36,7 @@ const EverpadNoteSnippetBase = new Lang.Class({
     type: EVERPAD_SNIPPET_TYPES.medium,
     _title_text_size: 13,
     _date_text_size: 9,
+    _notebook_text_size: 9,
     _snippet_length: 0,
     _snippet_wrap: 0,
     _snippet_text_size: 0,
@@ -446,6 +448,46 @@ const EverpadNoteSnippetBase = new Lang.Class({
         }
     },
 
+    make_notebook: function() {
+        if(!this.notebook) {
+            this._notebook_icon = new St.Icon({
+                icon_name: ICON_NAMES.notebook,
+                icon_size: this._notebook_text_size
+            });
+            this._notebook_name = new St.Label({
+                style: 'font-size: %spx'.format(this._notebook_text_size),
+                text: '...'
+            });
+
+            this.notebook = new St.BoxLayout();
+            this.notebook.add(this._notebook_icon, {
+                y_fill: false,
+                x_fill: false,
+                expand: false,
+                y_align: St.Align.START
+            });
+            this.notebook.add(this._notebook_name, {
+                y_fill: false,
+                x_fill: false,
+                expand: false,
+                y_align: St.Align.MIDDLE
+            });
+        }
+
+        DBus.get_everpad_provider().get_notebookRemote(this.note.notebook,
+            Lang.bind(this, function([result], error) {
+                if(result !== null) {
+                    let notebook = new EverpadTypes.EverpadNotebook(result);
+                    this._notebook_name.text = notebook.name;
+                }
+                else {
+                    this.notebook.hide();
+                    log('make_notebook(): %s'.format(error));
+                }
+            })
+        );
+    },
+
     make_date: function() {
         if(!this.date) {
             this.date = new St.Label({
@@ -521,6 +563,7 @@ const EverpadNoteSnippetBase = new Lang.Class({
 
         this.make_title();
         this.make_text();
+        this.make_notebook();
         this.make_date();
         this.make_buttons();
 
@@ -547,7 +590,7 @@ const EverpadNoteSnippetSmall = new Lang.Class({
             x_fill: true
         });
         this.actor.add(this.date, {
-            row: 2,
+            row: 1,
             col: 0,
             expand: false,
             x_fill: false,
@@ -556,7 +599,7 @@ const EverpadNoteSnippetSmall = new Lang.Class({
             y_align: St.Align.END
         });
         this.actor.add(this.buttons_bar.actor, {
-            row: 2,
+            row: 1,
             col: 1,
             expand: false,
             x_fill: false,

@@ -62,6 +62,17 @@ const EverpadNote = new Lang.Class({
     }
 });
 
+const EverpadNotebook = new Lang.Class({
+    Name: "EverpadNotebook",
+
+    _init: function(data) {
+        this.id = data[0];
+        this.name = data[1];
+        this.default = data[2];
+        this.stack = data[3];
+    }
+});
+
 const EverpadResource = new Lang.Class({
     Name: "EverpadResource",
 

@@ -40,6 +40,11 @@ const EverpadProviderDBusIface =
             <arg type="a(issxxiassbiaixs)" direction="out" />
         </method>
 
+        <method name="get_notebook">
+            <arg type="i" direction="in" />
+            <arg type="(isis)" direction="out" />
+        </method>
+
         <method name="update_note">
             <arg type="(issxxiassbiaixs)" direction="in" />
             <arg type="(issxxiassbiaixs)" direction="out" />
