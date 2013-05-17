@@ -37,7 +37,7 @@ const SYNC_STATES_TEXT = {
 };
 
 const ICON_NAMES = {
-    create_note: 'text-editor-symbolic',
+    create_note: 'accessories-text-editor-symbolic',
     all_notes: 'emblem-documents-symbolic',
     settings: 'preferences-other-symbolic',
     exit: 'system-shutdown-symbolic',
