@@ -18,7 +18,7 @@ const MENU_ANIMATION_TIME = 0.3;
 const EverpadMenu = new Lang.Class({
     Name: "EverpadMenu",
 
-    _init: function() {
+    _init: function(source_actor) {
         this.actor = new St.BoxLayout({
             style_class: 'everpad-menu-box',
             reactive: true
@@ -72,6 +72,7 @@ const EverpadMenu = new Lang.Class({
         this._open = false;
         this._is_hover = false;
         this._track_mouse_id = 0;
+        this._source_actor = source_actor;
 
         this._resize();
     },
@@ -248,6 +249,7 @@ const EverpadMenu = new Lang.Class({
 
         if(!Main.pushModal(this.actor)) return;
 
+        this.set_position(this._source_actor);
         this.actor.show();
         this._open = true;
 
