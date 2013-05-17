@@ -88,8 +88,8 @@ function escape_html(unsafe) {
          .replace(/'/g, "&#039;");
 }
 
-function html2text(html, callback) {
-    let result = html.replace(/<(?:.|\n)*?>/gm, '');
+function html2text(html) {
+    let result = html.replace(/<.*?>/gm, '');
     return result;
 }
 
