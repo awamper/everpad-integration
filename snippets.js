@@ -808,7 +808,7 @@ const EverpadSnippetsView = new Lang.Class({
 
     show_message: function(text, show_spinner) {
         show_spinner = show_spinner || false;
-        this._box.remove_all_children();
+        this._box.destroy_all_children();
 
         this._message_bin = new St.BoxLayout();
         this._box.add(this._message_bin, {
