@@ -29,8 +29,6 @@ const SIGNAL_IDS = {
 };
 
 function show_button() {
-    if(Main.sessionMode.currentMode !== 'user') return;
-
     everpad_button = new EverpadPanelButton();
 
     Everpad.TRIGGERS.refresh_latest = true;
