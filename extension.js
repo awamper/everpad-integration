@@ -111,7 +111,7 @@ const EverpadPanelButton = Lang.Class({
         this._button_box.add(this._label);
         this.actor.add_actor(this._button_box);
 
-        this._menu = new EverpadMenu.EverpadMenu();
+        this._menu = new EverpadMenu.EverpadMenu(this.actor);
         this._menu.set_logo(new St.Label({
             text: "Everpad",
             style_class: 'everpad-logo-label'
@@ -121,7 +121,6 @@ const EverpadPanelButton = Lang.Class({
         this._everpad = new Everpad.Everpad();
         this._sync_status = new EverpadSyncStatus.EverpadSyncStatus();
         this._menu.add_actor(this._sync_status.actor);
-        this._menu.set_position(this.actor);
 
         this._panel_progress_bar = new EverpadProgressBar.EverpadProgressBar({
             box_style_class: 'everpad-progress-bar-panel-box',
