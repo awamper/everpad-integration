@@ -1,7 +1,6 @@
 const St = imports.gi.St;
 const Lang = imports.lang;
 const Shell = imports.gi.Shell;
-const PointerWatcher = imports.ui.pointerWatcher;
 const Params = imports.misc.params;
 const Clutter = imports.gi.Clutter;
 const Tweener = imports.ui.tweener;
@@ -72,6 +71,7 @@ const EverpadMenu = new Lang.Class({
 
         this._open = false;
         this._is_hover = false;
+        this._track_mouse_id = 0;
 
         this._resize();
     },
@@ -124,18 +124,17 @@ const EverpadMenu = new Lang.Class({
     },
 
     _start_tracking_mouse: function() {
-        if(!this._pointer_watch) {
-            this._pointer_watch = PointerWatcher.getPointerWatcher().addWatch(
-                MOUSE_POLL_FREQUENCY,
-                Lang.bind(this, function() {
-                    let [x_mouse, y_mouse, mask] = global.get_pointer();
+        if(this._track_mouse_id === 0) {
+            this._track_mouse_id = global.stage.connect('motion-event',
+                Lang.bind(this, function(o, e) {
+                    let [stage_x, stage_y] = e.get_coords();
                     let allocation_box = this.actor.get_allocation_box();
 
                     if(
-                        x_mouse >= allocation_box.x1 &&
-                        x_mouse <= allocation_box.x2 &&
-                        y_mouse >= allocation_box.y1 - 15 &&
-                        y_mouse <= allocation_box.y2
+                        stage_x >= allocation_box.x1 &&
+                        stage_x <= allocation_box.x2 &&
+                        stage_y >= allocation_box.y1 - 15 &&
+                        stage_y <= allocation_box.y2
                     ) {
                         this._is_hover = true;
                     }
@@ -149,11 +148,10 @@ const EverpadMenu = new Lang.Class({
     },
 
     _stop_tracking_mouse: function() {
-        if(this._pointer_watch) {
-            this._pointer_watch.remove();
+        if(this._track_mouse_id > 0) {
+            global.stage.disconnect(this._track_mouse_id);
+            this._track_mouse_id = 0;
         }
-
-        this._pointer_watch = null;
     },
 
     set_logo: function(actor) {
@@ -267,6 +265,7 @@ const EverpadMenu = new Lang.Class({
     hide: function() {
         if(!this._open) return;
 
+        this._stop_tracking_mouse();
         Main.popModal(this.actor);
         this._open = false;
 
@@ -279,8 +278,6 @@ const EverpadMenu = new Lang.Class({
                 this.actor.hide();
             })
         });
-
-        this._stop_tracking_mouse();
     },
 
     get is_open() {
