@@ -536,7 +536,7 @@ const EverpadNoteSnippetBase = new Lang.Class({
     destroy: function() {
         this.note = null;
 
-        if(actor !== null) {
+        if(this.actor !== null) {
             this.actor.destroy();
             this.actor = null;
         }
