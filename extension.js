@@ -25,7 +25,8 @@ const ICON_NAMES = Me.imports.constants.ICON_NAMES;
 
 const SIGNAL_IDS = {
     sync_state: 0,
-    owner_changed: 0
+    owner_changed: 0,
+    data_changed: 0
 };
 
 function show_button() {
@@ -94,6 +95,7 @@ const EverpadPanelButton = Lang.Class({
         this._button_box.connect("enter-event", Lang.bind(this, function() {
             this._button_box.timeout_id = Mainloop.timeout_add(SHOW_MENU_DELAY,
                 Lang.bind(this, function() {
+                    this._label.remove_style_pseudo_class("updated");
                     this._sync_status.check_status();
                     this._menu.show();
                     this._panel_progress_bar.hide()
@@ -176,6 +178,14 @@ const EverpadPanelButton = Lang.Class({
                     }
                 })
             );
+        SIGNAL_IDS.data_changed = DBus.get_everpad_provider_signals().connectSignal(
+            'data_changed',
+            Lang.bind(this, function(proxy, sender) {
+                if(!this._everpad.is_open) {
+                    this._label.add_style_pseudo_class('updated');
+                }
+            })
+        )
     },
 
     _reposition_progress_bar: function() {
@@ -279,6 +289,16 @@ const EverpadPanelButton = Lang.Class({
             DBus.get_everpad_provider_signals().disconnectSignal(
                 SIGNAL_IDS.sync_state
             );
+
+            SIGNAL_IDS.sync_state = 0;
+        }
+
+        if(SIGNAL_IDS.data_changed > 0) {
+            DBus.get_everpad_provider_signals().disconnectSignal(
+                SIGNAL_IDS.data_changed
+            );
+
+            SIGNAL_IDS.data_changed = 0;
         }
 
         this._menu.destroy();
@@ -323,6 +343,7 @@ function enable() {
 function disable() {
     if(SIGNAL_IDS.owner_changed > 0) {
         DBus.get_dbus_control().disconnectSignal(SIGNAL_IDS.owner_changed);
+        SIGNAL_IDS.owner_changed = 0;
     }
 
     hide_button();

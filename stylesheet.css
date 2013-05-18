@@ -10,6 +10,10 @@
     background-color: #fff;
 }
 
+.everpad-panel-button:updated {
+    background-color: rgb(255, 64, 64);
+}
+
 .everpad-box {
     background-color: rgba(0, 0, 0, 0.9);
     /*border: 1px solid rgba(255, 255, 255, 0.5);*/
