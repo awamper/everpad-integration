@@ -32,10 +32,12 @@ const SIGNAL_IDS = {
 function show_button() {
     if(Main.sessionMode.currentMode !== 'user') return;
 
-    everpad_button = new EverpadPanelButton();
+    if(everpad_button === null) {
+        everpad_button = new EverpadPanelButton();
 
-    Everpad.TRIGGERS.refresh_latest = true;
-    Everpad.TRIGGERS.refresh_pinned = true;
+        Everpad.TRIGGERS.refresh_latest = true;
+        Everpad.TRIGGERS.refresh_pinned = true;
+    }
 }
 
 function hide_button() {
