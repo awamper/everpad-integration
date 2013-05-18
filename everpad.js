@@ -306,7 +306,7 @@ const Everpad = new Lang.Class({
     },
 
     _search_notes: function(term, scroll_to_top) {
-        scroll_to_top = scroll_to_top || false;
+        scroll_to_top = scroll_to_top || true;
         DBus.get_everpad_provider().find_notesRemote(
             term,
             [],
