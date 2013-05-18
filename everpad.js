@@ -137,15 +137,31 @@ const Everpad = new Lang.Class({
         SIGNAL_IDS.data_changed = DBus.get_everpad_provider_signals().connectSignal(
             'data_changed',
             Lang.bind(this, function(proxy, sender) {
-                TRIGGERS.refresh_pinned = true;
-                TRIGGERS.refresh_latest = true;
+                if(this._is_empty_entry(this._search_entry)) {
+                    TRIGGERS.refresh_latest = true;
+                    TRIGGERS.refresh_pinned = true;
 
-                if(this.is_open) {
-                    this.refresh_pinned_notes();
-                    this.refresh_latest_notes();
+                    if(this.is_open) {
+                        this.refresh_pinned_notes();
+                        this.refresh_latest_notes();
+                    }
+                }
+                else {
+                    if(this.is_open) {
+                        this._search_notes(this._search_entry.text, false);
+                    }
                 }
             })
         );
+    },
+
+    _is_empty_entry: function(entry) {
+        if(Utils.is_blank(entry.text) || entry.text === entry.hint_text) {
+            return true
+        }
+        else {
+            return false;
+        }
     },
 
     _resize: function() {
@@ -228,12 +244,10 @@ const Everpad = new Lang.Class({
     },
 
     _on_snipped_clicked: function(snippets_view, snippet) {
-        let term = this._search_entry.text;
-
-        if(!Utils.is_blank(term) && term != this._search_entry.hint_text) {
+        if(!this._is_empty_entry(this._search_entry)) {
             DBus.get_everpad_app().open_with_search_termRemote(
                 snippet.note.id,
-                term
+                this._search_entry.text
             );
         }
         else {
@@ -272,10 +286,7 @@ const Everpad = new Lang.Class({
     },
 
     _on_search_text_changed: function() {
-        let term = this._search_entry.text.trim();
-        let hint_text = this._search_entry.hint_text;
-
-        if(!Utils.is_blank(term) && term != hint_text) {
+        if(!this._is_empty_entry(this._search_entry)) {
             this._search_entry.set_secondary_icon(this._active_icon);
             this._remove_timeouts('search');
             TIMEOUT_IDS.search = Mainloop.timeout_add(SEARCH_DELAY,
@@ -284,7 +295,7 @@ const Everpad = new Lang.Class({
                         EverpadNotes.LABELS.searching,
                         true
                     );
-                    this._search_notes(term);
+                    this._search_notes(this._search_entry.text);
                 })
             );
         }
@@ -294,7 +305,8 @@ const Everpad = new Lang.Class({
         }
     },
 
-    _search_notes: function(term) {
+    _search_notes: function(term, scroll_to_top) {
+        scroll_to_top = scroll_to_top || false;
         DBus.get_everpad_provider().find_notesRemote(
             term,
             [],
@@ -322,7 +334,10 @@ const Everpad = new Lang.Class({
                             notes,
                             EverpadNoteSnippet.EVERPAD_SNIPPET_TYPES.medium
                         );
-                        this.notes_view.snippets_view.scroll_to(0);
+
+                        if(scroll_to_top) {
+                            this.notes_view.snippets_view.scroll_to(0);
+                        }
                     }
                 }
                 else {
