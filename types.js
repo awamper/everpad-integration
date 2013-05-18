@@ -36,11 +36,11 @@ const EverpadNote = new Lang.Class({
             this.created === note.created &&
             this.updated === note.updated &&
             this.notebook === note.notebook &&
-            this.tags.toJson === note.toJson &&
+            this.tags.toString() === note.tags.toString() &&
             this.place === note.place &&
             this.pinned === note.pinned &&
             this.conflict_parent === note.conflict_parent &&
-            this.conflict_items.toJson === note.conflict_items.toJson &&
+            this.conflict_items.toString() === note.conflict_items.toString() &&
             this.share_date === note.share_date &&
             this.share_url === note.share_url
         ) {
