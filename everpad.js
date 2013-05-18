@@ -367,7 +367,15 @@ const Everpad = new Lang.Class({
                         notes,
                         EverpadNoteSnippet.EVERPAD_SNIPPET_TYPES.small
                     );
-                    this.pinned_view.set_label("Pinned notes", false);
+
+                    if(notes.length > 1) {
+                        this.pinned_view.set_label(
+                            'Pinned notes(%s)'.format(notes.length)
+                        );
+                    }
+                    else {
+                        this.pinned_view.set_label("Pinned notes", false);
+                    }
                 }
                 else {
                     this.pinned_view.snippets_view.show_message("Error", false);
