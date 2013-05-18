@@ -318,15 +318,16 @@ const Everpad = new Lang.Class({
                         this.notes_view.set_label(
                             EverpadNotes.LABELS.search + '(%s)'.format(notes.length)
                         );
-                        this.notes_view.set_notes(
+                        this.notes_view.snippets_view.update(
                             notes,
                             EverpadNoteSnippet.EVERPAD_SNIPPET_TYPES.medium
                         );
+                        this.notes_view.snippets_view.scroll_to(0);
                     }
                 }
                 else {
                     this.notes_view.snippets_view.show_message(
-                        "Error: "+error,
+                        "_search_notes(): "+error,
                         false
                     );
                     log(error);
@@ -362,7 +363,7 @@ const Everpad = new Lang.Class({
             Lang.bind(this, function(result, error) {
                 if(result != null) {
                     let notes = this._load_notes(result);
-                    this.pinned_view.set_notes(
+                    this.pinned_view.snippets_view.update(
                         notes,
                         EverpadNoteSnippet.EVERPAD_SNIPPET_TYPES.small
                     );
@@ -370,7 +371,7 @@ const Everpad = new Lang.Class({
                 }
                 else {
                     this.pinned_view.snippets_view.show_message("Error", false);
-                    log("show_pinned_notes(): " + error);
+                    log("refresh_pinned_notes(): " + error);
                 }
             })
         );
@@ -402,7 +403,7 @@ const Everpad = new Lang.Class({
                         );
                     }
                     else {
-                        this.notes_view.set_notes(
+                        this.notes_view.snippets_view.update(
                             notes,
                             EverpadNoteSnippet.EVERPAD_SNIPPET_TYPES.medium
                         );
@@ -413,7 +414,7 @@ const Everpad = new Lang.Class({
                         "Error: " + error,
                         false
                     );
-                    log("show_latest_notes(): " + error);
+                    log("refresh_latest_notes(): " + error);
                 }
             })
         );
