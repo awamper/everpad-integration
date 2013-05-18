@@ -17,7 +17,6 @@ const StatusBar = Me.imports.status_bar;
 const ButtonsBar = Me.imports.buttons_bar;
 
 const ICON_NAMES = Me.imports.constants.ICON_NAMES;
-const DATE_ANIMATION_TIME = 0.2;
 const SNIPPET_HINT_TIMEOUT = 1000;
 
 const EVERPAD_SNIPPET_TYPES = {
@@ -25,9 +24,12 @@ const EVERPAD_SNIPPET_TYPES = {
     medium: 1,
     big: 2
 };
+
 const ANIMATION_TIMES = {
     add_snippet: 0.5,
-    remove_snippet: 0.3
+    remove_snippet: 0.3,
+    date: 0.2,
+    more_info: 0.3
 };
 
 const EverpadNoteSnippetBase = new Lang.Class({
@@ -40,9 +42,16 @@ const EverpadNoteSnippetBase = new Lang.Class({
     _snippet_length: 0,
     _snippet_wrap: 0,
     _snippet_text_size: 0,
-    _show_icon: false,
     _icon_width: 120,
     _icon_height: 120,
+    _make_title: true,
+    _make_date: true,
+    _make_buttons: true,
+    _make_text: false,
+    _make_notebook: false,
+    _make_tags: false,
+    _make_more_info: false,
+    _make_icon: false,
 
     _init: function(note) {
         this.set_note(note);
@@ -56,6 +65,10 @@ const EverpadNoteSnippetBase = new Lang.Class({
         });
         this.actor.connect("destroy", Lang.bind(this, this._on_actor_destroy));
         this.actor.connect("enter-event", Lang.bind(this, function() {
+            if(this.actor.timeout_id > 0) {
+                Mainloop.source_remove(this.actor.timeout_id);
+            }
+
             this.actor.timeout_id = Mainloop.timeout_add(
                 SNIPPET_HINT_TIMEOUT,
                 Lang.bind(this, function() {
@@ -78,9 +91,10 @@ const EverpadNoteSnippetBase = new Lang.Class({
                 }));
         }));
         this.actor.connect("leave-event", Lang.bind(this, function() {
-            if(this.actor.timeout_id != 0) {
+            if(this.actor.timeout_id > 0) {
                 Mainloop.source_remove(this.actor.timeout_id);
             }
+
             this.actor.remove_style_pseudo_class('updated');
             Utils.get_status_bar().remove_message(this.actor.statusbar_message_id);
         }));
@@ -93,7 +107,6 @@ const EverpadNoteSnippetBase = new Lang.Class({
                     // this.actor.add_style_pseudo_class('active');
                 }
                 else if(button === Clutter.BUTTON_SECONDARY) {
-                    log(this.note.share_url);
                     if(!Utils.is_blank(this.note.share_url)) {
                         this._clipboard.set_text(this.note.share_url);
                         Utils.get_status_bar().add_message(
@@ -497,7 +510,7 @@ const EverpadNoteSnippetBase = new Lang.Class({
                     Utils.label_transition(
                         this.date,
                         this.date.hover_text,
-                        DATE_ANIMATION_TIME
+                        ANIMATION_TIMES.date
                     );
                 })
             );
@@ -512,7 +525,7 @@ const EverpadNoteSnippetBase = new Lang.Class({
                 Utils.label_transition(
                     this.date,
                     this.date.default_text,
-                    DATE_ANIMATION_TIME
+                    ANIMATION_TIMES.date
                 );
             }
         }));
@@ -533,6 +546,60 @@ const EverpadNoteSnippetBase = new Lang.Class({
         }
     },
 
+    make_tags: function() {
+        if(!this.tags) {
+            this.tags = new St.BoxLayout();
+
+            for(let i = 0; i < this.note.tags.length; i++) {
+                let style =
+                    "font-size: "+this._notebook_text_size+"px;" +
+                    "background-color: #545353;" +
+                    "padding: 1px;" +
+                    "border: 1px solid #9C9C9C;";
+                let tag = new St.Label({
+                    style: style,
+                    text: this.note.tags[i],
+                    margin_right: 2,
+                    margin_left: 2
+                });
+                this.tags.add_actor(tag);
+            }
+        }
+    },
+
+    make_more_info: function() {
+        if(!this.more_info) {
+            this.more_info = new St.Table({
+                style: 'background-color: rgba(0, 0, 0, 0.8);',
+                homogeneous: false
+            });
+
+            this.tags.margin_right = 10;
+            this.tags.margin_bottom = 3;
+            this.notebook.margin_right = 10;
+            this.notebook.margin_top = 3;
+
+            this.more_info.add(this.notebook, {
+                row: 0,
+                col: 0,
+                expand: false,
+                x_fill: false,
+                y_fill: false,
+                x_align: St.Align.END,
+                y_align: St.Align.MIDDLE
+            });
+            this.more_info.add(this.tags, {
+                row: 1,
+                col: 0,
+                expand: false,
+                x_fill: false,
+                y_fill: false,
+                x_align: St.Align.END,
+                y_align: St.Align.MIDDLE
+            });
+        }
+    },
+
     destroy: function() {
         this.note = null;
 
@@ -550,13 +617,28 @@ const EverpadNoteSnippetBase = new Lang.Class({
             this.note = note;
         }
 
-        this.make_title();
-        this.make_text();
-        this.make_notebook();
-        this.make_date();
-        this.make_buttons();
-
-        if(this._show_icon) {
+        if(this._make_title) {
+            this.make_title();
+        }
+        if(this._make_text) {
+            this.make_text();
+        }
+        if(this._make_notebook) {
+            this.make_notebook();
+        }
+        if(this._make_tags) {
+            this.make_tags();
+        }
+        if(this._make_date) {
+            this.make_date();
+        }
+        if(this._make_buttons) {
+            this.make_buttons();
+        }
+        if(this._make_more_info) {
+            this.make_more_info();
+        }
+        if(this._make_icon) {
             this.make_icon();
         }
 
@@ -610,6 +692,10 @@ const EverpadNoteSnippetMedium = new Lang.Class({
     _snippet_wrap: 105,
     _title_text_size: 14,
     _snippet_text_size: 10,
+    _make_notebook: true,
+    _make_tags: true,
+    _make_text: true,
+    _make_more_info: true,
 
     _init: function(note) {
         this.parent(note);
@@ -644,6 +730,66 @@ const EverpadNoteSnippetMedium = new Lang.Class({
             y_fill: false,
             x_align: St.Align.END,
             y_align: St.Align.END
+        });
+        this.actor.add(this.more_info, {
+            row: 0,
+            col: 0,
+            col_span: 2,
+            row_span: 3,
+            x_fill: true,
+            y_fill: false,
+            y_align: St.Align.START
+        });
+
+        this.actor.connect("enter-event", Lang.bind(this, function() {
+            if(this.more_info.timeout_id > 0) {
+                Mainloop.source_remove(this.more_info.timeout_id);
+                this.more_info.timeout_id = 0;
+            }
+
+            this.more_info.timeout_id = Mainloop.timeout_add(1000,
+                Lang.bind(this, this.show_more_info)
+            );
+        }));
+        this.actor.connect("leave-event", Lang.bind(this, function() {
+            if(this.more_info.timeout_id > 0) {
+                Mainloop.source_remove(this.more_info.timeout_id);
+                this.more_info.timeout_id = 0;
+            }
+
+            this.hide_more_info();
+        }));
+
+        let [min_h, natural_h] = this.title.get_preferred_height(-1);
+        this.more_info.height = natural_h * 2;
+        this.more_info.hide();
+    },
+
+    show_more_info: function() {
+        if(this.more_info.visible) return;
+
+        this.more_info.opacity = 0;
+        this.more_info.show();
+
+        Tweener.removeTweens(this.more_info);
+        Tweener.addTween(this.more_info, {
+            time: ANIMATION_TIMES.more_info,
+            transition: "easeOutQuad",
+            opacity: 255
+        });
+    },
+
+    hide_more_info: function() {
+        if(!this.more_info.visible) return;
+
+        Tweener.removeTweens(this.more_info);
+        Tweener.addTween(this.more_info, {
+            time: ANIMATION_TIMES.more_info,
+            transition: "easeOutQuad",
+            opacity: 0,
+            onComplete: Lang.bind(this, function() {
+                this.more_info.hide();
+            })
         });
     },
 
