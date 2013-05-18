@@ -28,6 +28,29 @@ const EverpadNote = new Lang.Class({
         this.share_url = data[12];
     },
 
+    is_equal_to: function(note) {
+        if(
+            this.id === note.id &&
+            this.title === note.title &&
+            this.content === note.content &&
+            this.created === note.created &&
+            this.updated === note.updated &&
+            this.notebook === note.notebook &&
+            this.tags.toJson === note.toJson &&
+            this.place === note.place &&
+            this.pinned === note.pinned &&
+            this.conflict_parent === note.conflict_parent &&
+            this.conflict_items.toJson === note.conflict_items.toJson &&
+            this.share_date === note.share_date &&
+            this.share_url === note.share_url
+        ) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
+
     get for_dbus() {
         let result = [
             this.id,
@@ -46,19 +69,6 @@ const EverpadNote = new Lang.Class({
         ];
 
         return result;
-    },
-
-    get hash() {
-        let string =
-            this.title +
-            this.content +
-            this.created +
-            this.updated +
-            this.pinned.toString() +
-            this.share_date +
-            this.share_url
-        let hash = Utils.hash_code(string);
-        return hash;
     }
 });
 
