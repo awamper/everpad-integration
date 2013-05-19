@@ -736,8 +736,9 @@ const EverpadNoteSnippetMedium = new Lang.Class({
             col: 0,
             col_span: 2,
             row_span: 3,
-            x_fill: true,
+            x_fill: false,
             y_fill: false,
+            x_align: St.Align.END,
             y_align: St.Align.START
         });
 
