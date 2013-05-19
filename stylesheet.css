@@ -4,14 +4,17 @@
     padding: 0px 4px 0px 4px;
     border-radius: 8px;
     font-size: 13px;
+    transition-duration: 300;
 }
 
 .everpad-panel-button:hover {
     background-color: #fff;
+    transition-duration: 300;
 }
 
 .everpad-panel-button:updated {
     background-color: rgb(255, 64, 64);
+    transition-duration: 300;
 }
 
 .everpad-box {
