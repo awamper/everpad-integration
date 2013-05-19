@@ -278,3 +278,13 @@
     background-color: #3465a4;
     border: 1px solid #3465a4;
 }
+
+.snippet-updated-scroll-button {
+    background-color: rgb(255, 64, 64);
+    transition-duration: 300;
+}
+
+.snippet-updated-scroll-button:hover {
+    background-color: rgb(255, 0, 0);
+    transition-duration: 300;
+}
