@@ -570,13 +570,15 @@ const EverpadNoteSnippetBase = new Lang.Class({
     make_more_info: function() {
         if(!this.more_info) {
             this.more_info = new St.Table({
-                style: 'background-color: rgba(0, 0, 0, 0.8);',
+                style: 'background-color: rgba(0, 0, 0, 0.7);',
                 homogeneous: false
             });
 
-            this.tags.margin_right = 10;
+            this.tags.margin_right = 3;
+            this.tags.margin_left = 3;
             this.tags.margin_bottom = 3;
-            this.notebook.margin_right = 10;
+            this.notebook.margin_right = 3;
+            this.notebook.margin_left = 3;
             this.notebook.margin_top = 3;
 
             this.more_info.add(this.notebook, {
