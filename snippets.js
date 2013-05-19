@@ -760,14 +760,15 @@ const EverpadNoteSnippetMedium = new Lang.Class({
             this.hide_more_info();
         }));
 
-        let [min_h, natural_h] = this.title.get_preferred_height(-1);
-        this.more_info.height = natural_h * 2;
         this.more_info.hide();
     },
 
     show_more_info: function() {
         if(this.more_info.visible) return;
 
+        let [min_h, natural_h] = this.title.get_preferred_height(-1);
+
+        this.more_info.height = natural_h * 2;
         this.more_info.opacity = 0;
         this.more_info.show();
 
