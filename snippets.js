@@ -95,6 +95,10 @@ const EverpadNoteSnippetBase = new Lang.Class({
                 Mainloop.source_remove(this.actor.timeout_id);
             }
 
+            if(this.scroll_button) {
+                this.scroll_button.destroy();
+            }
+
             this.actor.remove_style_pseudo_class('updated');
             Utils.get_status_bar().remove_message(this.actor.statusbar_message_id);
         }));
@@ -865,6 +869,7 @@ const EverpadSnippetsView = new Lang.Class({
         this.actor.add_actor(this._box);
 
         this._snippets = [];
+        this._scroll_timeout_id = 0;
     },
 
     _notes_to_remove: function(new_notes) {
@@ -916,6 +921,9 @@ const EverpadSnippetsView = new Lang.Class({
             snippet.connect("clicked", Lang.bind(this, function(snippet) {
                 this.emit("snippet-clicked", snippet);
             }));
+            snippet.connect("note-changed", Lang.bind(
+                this, this._on_note_changed)
+            );
         }
         else {
             throw new Error('not EverpadNoteSnippetBase instance');
@@ -957,6 +965,61 @@ const EverpadSnippetsView = new Lang.Class({
             snippet.set_note(new_note);
             snippet.actor.add_style_pseudo_class('updated');
         }));
+    },
+
+    _on_note_changed: function(snippet, note) {
+        let adjustment = this.actor.vscroll.adjustment;
+        let index = this._snippets.indexOf(snippet);
+
+        if(adjustment.upper <= adjustment.page_size || index === -1) return;
+
+        if(!this._scroll_trough) {
+            this._scroll_trough = this.actor.vscroll.get_first_child();
+        }
+        if(!this._scroll_buttons_box) {
+            this._scroll_buttons_box = new St.BoxLayout({
+                height: this._scroll_trough.height,
+                width: this._scroll_trough.width,
+                reactive: false
+            });
+            this._scroll_trough.add_actor(this._scroll_buttons_box);
+        }
+
+        let button = new St.Button({
+            style_class: 'snippet-updated-scroll-button',
+            opacity: 0
+        });
+        button.connect("clicked", Lang.bind(this, function() {
+            this.scroll_to(button.scroll_position);
+            button.destroy();
+        }));
+        button.height = Math.floor(
+            Math.max(3, this._scroll_trough.height / this._snippets.length)
+        );
+        button.x = this._scroll_trough.x;
+        button.y = Math.floor(
+            this._scroll_trough.height / this._snippets.length * index
+        );
+        button.width = this._scroll_trough.width - 6;
+        button.scroll_position = Math.max(Math.floor(
+            adjustment.upper / this._snippets.length * index - snippet.actor.height
+        ), 0);
+
+        this._scroll_buttons_box.add(button, {
+            expand: false,
+            x_fill: false,
+            y_fill: false,
+            x_align: St.Align.MIDDLE
+        });
+
+        Tweener.removeTweens(button);
+        Tweener.addTween(button, {
+            time: 0.3,
+            transition: "easeOutQuad",
+            opacity: 255
+        })
+
+        snippet.scroll_button = button;
     },
 
     show_message: function(text, show_spinner) {
@@ -1054,6 +1117,9 @@ const EverpadSnippetsView = new Lang.Class({
 
     scroll_to: function(value) {
         let adjustment = this.actor.vscroll.adjustment;
+        value = Math.floor(
+            Math.min(adjustment.upper - adjustment.page_size, value)
+        );
 
         if(value === adjustment.value) return;
 
@@ -1061,19 +1127,26 @@ const EverpadSnippetsView = new Lang.Class({
         let step_max = 150;
         let scroll_to_bottom = value > adjustment.value ? true : false
 
-        Mainloop.timeout_add(30, Lang.bind(this, function() {
-            let diff = Math.ceil(Math.abs(adjustment.value - value));
-            let step = Math.max(Math.min(diff / 10, step_max), step_min);
+        if(this._scroll_timeout_id > 0) {
+            Mainloop.source_remove(this._scroll_timeout_id);
+            this._scroll_timeout_id = 0;
+        }
 
-            if(scroll_to_bottom) {
-                adjustment.value = adjustment.value + step;
-                return adjustment.value >= value ? false : true;
-            }
-            else {
-                adjustment.value = adjustment.value - step;
-                return adjustment.value <= value ? false : true;
-            }
-        }));
+        this._scroll_timeout_id = Mainloop.timeout_add(30,
+            Lang.bind(this, function() {
+                let diff = Math.ceil(Math.abs(adjustment.value - value));
+                let step = Math.max(Math.min(diff / 10, step_max), step_min);
+
+                if(scroll_to_bottom) {
+                    adjustment.value = Math.floor(adjustment.value + step);
+                    return adjustment.value >= value ? false : true;
+                }
+                else {
+                    adjustment.value = adjustment.value - step;
+                    return adjustment.value <= value ? false : true;
+                }
+            })
+        );
     },
 
     scroll_to_first_updated: function() {
