@@ -14,6 +14,7 @@ const Tweener = imports.ui.tweener;
 const Me = ExtensionUtils.getCurrentExtension();
 const StatusBar = Me.imports.status_bar;
 
+const SETTINGS = getSettings();
 let STATUS_BAR = null;
 
 function get_status_bar() {

@@ -2,6 +2,7 @@
     "shell-version": [
         "3.6"
     ],
+    "settings-schema": "org.gnome.shell.extensions.everpad-integration",
     "uuid": "everpad_integration@awamper.gmail.com",
     "url": "https://github.com/awamper/everpad-integration",
     "name": "Everpad Integration",

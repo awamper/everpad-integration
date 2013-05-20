@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extensions">
+
+  <schema path="/org/gnome/shell/extensions/everpad-integration/" id="org.gnome.shell.extensions.everpad-integration">
+
+    <key type="as" name="open-snippets">
+        <default><![CDATA[['<Super>E']]]></default>
+    </key>
+
+  </schema>
+</schemalist>

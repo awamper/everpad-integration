@@ -7,6 +7,7 @@ const Clutter = imports.gi.Clutter;
 const Panel = imports.ui.panel;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
+const Meta = imports.gi.Meta;
 const ExtensionUtils = imports.misc.extensionUtils;
 
 const Me = ExtensionUtils.getCurrentExtension();
@@ -16,6 +17,7 @@ const EverpadMenu = Me.imports.menu;
 const EverpadSyncStatus = Me.imports.sync_status;
 const EverpadProgressBar = Me.imports.progress_bar;
 const DBus = Me.imports.dbus;
+const PrefsKeys = Me.imports.prefs_keys;
 
 const SYNC_STATES = Me.imports.constants.SYNC_STATES;
 const SYNC_STATES_TEXT = Me.imports.constants.SYNC_STATES_TEXT;
@@ -186,6 +188,8 @@ const EverpadPanelButton = Lang.Class({
                 }
             })
         )
+
+        this._add_keybindings();
     },
 
     _reposition_progress_bar: function() {
@@ -247,6 +251,21 @@ const EverpadPanelButton = Lang.Class({
         this._button_box.add_actor(this._label);
     },
 
+    _add_keybindings: function() {
+        global.display.add_keybinding(
+            PrefsKeys.OPEN_SNIPPETS_KEY,
+            Utils.SETTINGS,
+            Meta.KeyBindingFlags.NONE,
+            Lang.bind(this, function() {
+                this._everpad.toggle();
+            })
+        );
+    },
+
+    _remove_keybindings: function() {
+        global.display.remove_keybinding(PrefsKeys.OPEN_SNIPPETS_KEY);
+    },
+
     _on_button_press: function(o, e) {
         let button = e.get_button();
 
@@ -285,6 +304,8 @@ const EverpadPanelButton = Lang.Class({
     },
 
     destroy: function() {
+        this._remove_keybindings();
+
         if(SIGNAL_IDS.sync_state > 0) {
             DBus.get_everpad_provider_signals().disconnectSignal(
                 SIGNAL_IDS.sync_state
