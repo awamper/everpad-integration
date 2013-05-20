@@ -93,9 +93,9 @@ const EverpadPanelButton = Lang.Class({
             this._on_button_press
         ));
         this._button_box.connect("enter-event", Lang.bind(this, function() {
+            this._label.remove_style_pseudo_class("updated");
             this._button_box.timeout_id = Mainloop.timeout_add(SHOW_MENU_DELAY,
                 Lang.bind(this, function() {
-                    this._label.remove_style_pseudo_class("updated");
                     this._sync_status.check_status();
                     this._menu.show();
                     this._panel_progress_bar.hide()
